@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_wellhub" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.afr_wellhub</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="90"/>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app
+                    string="Wellhub / Asaas"
+                    name="afr_wellhub"
+                    groups="afr_wellhub.group_afr_wellhub_manager"
+                >
+                    <block title="API Asaas">
+                        <setting
+                            string="Ambiente"
+                            help="Sandbox usa api-sandbox.asaas.com; produção usa api.asaas.com."
+                        >
+                            <field name="wellhub_asaas_environment"/>
+                        </setting>
+                        <setting
+                            string="Chave de API"
+                            help="Enviada no header access_token (documentação Asaas)."
+                        >
+                            <field name="wellhub_asaas_api_key" widget="password"/>
+                        </setting>
+                        <setting string="Timeout HTTP (segundos)">
+                            <field name="wellhub_asaas_timeout"/>
+                        </setting>
+                    </block>
+                    <block title="Assinaturas (padrão)">
+                        <setting string="Valor mensal padrão">
+                            <field name="wellhub_default_subscription_value"/>
+                        </setting>
+                        <setting string="Forma de pagamento padrão">
+                            <field name="wellhub_default_billing_type"/>
+                        </setting>
+                        <setting string="Periodicidade padrão">
+                            <field name="wellhub_default_cycle"/>
+                        </setting>
+                        <setting
+                            string="Desconto (Asaas)"
+                            help="Aplicado a novos colaboradores criados no backend e como base quando o portal usa 'Igual ao padrão'."
+                        >
+                            <div class="content-group">
+                                <div class="row mt-2">
+                                    <label class="col-lg-3" for="wellhub_default_asaas_discount_type"/>
+                                    <field name="wellhub_default_asaas_discount_type"/>
+                                </div>
+                                <div class="row mt-2" invisible="wellhub_default_asaas_discount_type == 'none'">
+                                    <label class="col-lg-3" for="wellhub_default_asaas_discount_value"/>
+                                    <field name="wellhub_default_asaas_discount_value"/>
+                                </div>
+                                <div class="row mt-2" invisible="wellhub_default_asaas_discount_type == 'none'">
+                                    <label class="col-lg-3" for="wellhub_default_asaas_discount_due_date_limit_days"/>
+                                    <field name="wellhub_default_asaas_discount_due_date_limit_days"/>
+                                </div>
+                            </div>
+                        </setting>
+                        <setting string="Juros ao mês % (Asaas)">
+                            <field name="wellhub_default_asaas_interest_monthly_percent"/>
+                        </setting>
+                        <setting
+                            string="Multa (Asaas)"
+                            help="Percentual ou valor fixo sobre a cobrança após o vencimento, conforme documentação Asaas."
+                        >
+                            <div class="content-group">
+                                <div class="row mt-2">
+                                    <label class="col-lg-3" for="wellhub_default_asaas_fine_type"/>
+                                    <field name="wellhub_default_asaas_fine_type"/>
+                                </div>
+                                <div class="row mt-2" invisible="wellhub_default_asaas_fine_type == 'none'">
+                                    <label class="col-lg-3" for="wellhub_default_asaas_fine_value"/>
+                                    <field name="wellhub_default_asaas_fine_value"/>
+                                </div>
+                            </div>
+                        </setting>
+                    </block>
+                    <block
+                        title="Inscrição pelo portal (formulário público)"
+                        name="wellhub_portal_block"
+                    >
+                        <setting
+                            string="Valor da assinatura"
+                            help="Se preenchido (> 0), usado nos colaboradores criados pelo site e na ativação por e-mail. Se zero, usa o valor do bloco Assinaturas (padrão) acima."
+                        >
+                            <field name="wellhub_portal_default_subscription_value"/>
+                        </setting>
+                        <setting string="Forma de pagamento">
+                            <field name="wellhub_portal_default_billing_type"/>
+                        </setting>
+                        <setting string="Periodicidade">
+                            <field name="wellhub_portal_default_cycle"/>
+                        </setting>
+                        <setting string="Repassar pacote e-mail/SMS (Asaas)">
+                            <field name="wellhub_portal_pass_notification_email_sms_fee"/>
+                        </setting>
+                        <setting string="Repassar taxa do cartão ao cliente">
+                            <field name="wellhub_portal_pass_credit_card_fee_to_customer"/>
+                        </setting>
+                        <setting
+                            string="Desconto (portal)"
+                            help="Igual ao padrão (Assinaturas) copia os valores do bloco acima. Caso contrário, usa os campos abaixo na inscrição e na ativação."
+                        >
+                            <div class="content-group">
+                                <div class="row mt-2">
+                                    <label class="col-lg-3" for="wellhub_portal_asaas_discount_type"/>
+                                    <field name="wellhub_portal_asaas_discount_type"/>
+                                </div>
+                                <div class="row mt-2" invisible="wellhub_portal_asaas_discount_type == 'inherit' or wellhub_portal_asaas_discount_type == 'none'">
+                                    <label class="col-lg-3" for="wellhub_portal_asaas_discount_value"/>
+                                    <field name="wellhub_portal_asaas_discount_value"/>
+                                </div>
+                                <div class="row mt-2" invisible="wellhub_portal_asaas_discount_type == 'inherit' or wellhub_portal_asaas_discount_type == 'none'">
+                                    <label class="col-lg-3" for="wellhub_portal_asaas_discount_due_date_limit_days"/>
+                                    <field name="wellhub_portal_asaas_discount_due_date_limit_days"/>
+                                </div>
+                            </div>
+                        </setting>
+                        <setting string="Juros ao mês (portal)">
+                            <div class="content-group">
+                                <div class="row mt-2">
+                                    <label class="col-lg-3" for="wellhub_portal_asaas_interest_mode"/>
+                                    <field name="wellhub_portal_asaas_interest_mode"/>
+                                </div>
+                                <div class="row mt-2" invisible="wellhub_portal_asaas_interest_mode == 'inherit'">
+                                    <label class="col-lg-3" for="wellhub_portal_asaas_interest_monthly_percent"/>
+                                    <field name="wellhub_portal_asaas_interest_monthly_percent"/>
+                                </div>
+                            </div>
+                        </setting>
+                        <setting
+                            string="Multa (portal)"
+                            help="Igual ao padrão (Assinaturas) usa os mesmos valores do bloco Assinaturas (padrão) acima."
+                        >
+                            <div class="content-group">
+                                <div class="row mt-2">
+                                    <label class="col-lg-3" for="wellhub_portal_asaas_fine_type"/>
+                                    <field name="wellhub_portal_asaas_fine_type"/>
+                                </div>
+                                <div class="row mt-2" invisible="wellhub_portal_asaas_fine_type == 'inherit' or wellhub_portal_asaas_fine_type == 'none'">
+                                    <label class="col-lg-3" for="wellhub_portal_asaas_fine_value"/>
+                                    <field name="wellhub_portal_asaas_fine_value"/>
+                                </div>
+                            </div>
+                        </setting>
+                    </block>
+                    <block title="Notificações (repasse ao cliente)" name="wellhub_notif_block">
+                        <setting
+                            string="Valor pacote e-mail + SMS"
+                            help="Taxa de referência divulgada pelo Asaas para o pacote de notificações por e-mail e SMS por transação; ajuste conforme Minha conta > Taxas. Documentação: https://docs.asaas.com/docs/notificacoes"
+                        >
+                            <field name="wellhub_notification_package_fee"/>
+                        </setting>
+                    </block>
+                    <block
+                        title="Taxa de cartão (repasse ao cliente)"
+                        name="wellhub_cc_fee_block"
+                    >
+                        <setting
+                            string="Taxa fixa (cartão)"
+                            help="Padrão público Asaas (cartão à vista): R$ 0,49 por cobrança. Confira valores atualizados em https://www.asaas.com/precos-e-taxas e no menu Taxas da sua conta."
+                        >
+                            <field name="wellhub_cc_fee_fixed"/>
+                        </setting>
+                        <setting
+                            string="Taxa percentual (cartão)"
+                            help="Padrão público (à vista): 2,99%. Promoção para novos clientes pode ser 1,99% (3 meses). Parcelamentos têm percentuais maiores na mesma página."
+                        >
+                            <field name="wellhub_cc_fee_percent"/>
+                        </setting>
+                    </block>
+                    <block title="Webhook">
+                        <setting
+                            string="Token do webhook (asaas-access-token)"
+                            help="Defina o mesmo valor no authToken do webhook no painel Asaas. URL: /afr_wellhub/asaas/webhook"
+                        >
+                            <field name="wellhub_asaas_webhook_token" widget="password"/>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+</odoo>

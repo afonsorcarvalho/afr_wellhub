@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_wellhub_collaborator_tree" model="ir.ui.view">
+        <field name="name">wellhub.collaborator.tree</field>
+        <field name="model">wellhub.collaborator</field>
+        <field name="arch" type="xml">
+            <list string="Colaboradores Wellhub">
+                <field name="name"/>
+                <field name="email"/>
+                <field name="phone"/>
+                <field name="signup_pending" optional="show"/>
+                <field name="wellhub_subscription_enrolled" optional="show"/>
+                <field name="wellhub_subscription_active"/>
+                <field name="is_adimplente_active" optional="show"/>
+                <field name="is_delinquent"/>
+                <field name="asaas_customer_id" optional="hide"/>
+                <field name="asaas_subscription_id" optional="hide"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_wellhub_collaborator_form" model="ir.ui.view">
+        <field name="name">wellhub.collaborator.form</field>
+        <field name="model">wellhub.collaborator</field>
+        <field name="arch" type="xml">
+            <form string="Colaborador Wellhub">
+                <header>
+                    <button
+                        name="action_sync_payments_from_asaas"
+                        type="object"
+                        string="Sincronizar cobranças Asaas"
+                        class="btn-primary"
+                        groups="afr_wellhub.group_afr_wellhub_manager"
+                    />
+                    <button
+                        name="action_sync_wellhub_api"
+                        type="object"
+                        string="Sincronizar API Wellhub"
+                        groups="afr_wellhub.group_afr_wellhub_manager"
+                    />
+                    <button
+                        name="action_resend_signup_confirmation_email"
+                        type="object"
+                        string="Reenviar e-mail de confirmação"
+                        class="btn-secondary"
+                        invisible="wellhub_subscription_enrolled"
+                        groups="afr_wellhub.group_afr_wellhub_manager"
+                        help="Reenvia o link de ativação da inscrição pelo portal. Só tem efeito se houver inscrição pendente de confirmação por e-mail."
+                    />
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button
+                            class="oe_stat_button"
+                            icon="fa-money"
+                            type="action"
+                            name="%(action_wellhub_asaas_payment)d"
+                            context="{'search_default_collaborator_id': id, 'default_collaborator_id': id}"
+                        >
+                            <field name="payment_count" widget="statinfo" string="Cobranças"/>
+                        </button>
+                    </div>
+                    <group>
+                        <group string="Cadastro">
+                            <field name="name"/>
+                            <field name="email"/>
+                            <field name="phone"/>
+                            <field name="cpf_cnpj"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="active"/>
+                        </group>
+                        <group string="Wellhub">
+                            <field name="wellhub_subscription_enrolled"/>
+                            <field name="wellhub_subscription_active" readonly="1"/>
+                            <field name="signup_pending" readonly="1"/>
+                            <field
+                                name="portal_inscription"
+                                readonly="1"
+                                groups="afr_wellhub.group_afr_wellhub_manager"
+                            />
+                            <field
+                                name="signup_email_confirmed_at"
+                                readonly="1"
+                                invisible="not signup_email_confirmed_at"
+                            />
+                            <field name="signup_token" readonly="1" invisible="not signup_pending"/>
+                            <field name="signup_token_expiry" readonly="1" invisible="not signup_pending"/>
+                            <field name="wellhub_external_id"/>
+                            <field name="wellhub_last_sync" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Assinatura Asaas">
+                        <div
+                            class="alert alert-info mb-3"
+                            colspan="2"
+                            invisible="not wellhub_subscription_enrolled"
+                            role="alert"
+                        >
+                            <p class="mb-0">
+                                O Asaas gera uma <strong>Assinatura</strong> (recorrência via
+                                <code>POST /v3/subscriptions</code>). As faturas mensais aparecem em
+                                Cobranças com vínculo a essa assinatura; no painel, consulte também o menu Assinaturas.
+                            </p>
+                        </div>
+                        <group>
+                            <field name="subscription_value"/>
+                            <field name="billing_type"/>
+                            <field name="pass_asaas_notification_email_sms_fee"/>
+                            <field
+                                name="asaas_net_before_card_preview"
+                                readonly="1"
+                                invisible="not pass_asaas_notification_email_sms_fee"
+                            />
+                            <field name="pass_credit_card_fee_to_customer"/>
+                            <field name="asaas_charge_value_preview" readonly="1"/>
+                            <field name="subscription_cycle"/>
+                            <field name="next_due_date"/>
+                        </group>
+                        <group>
+                            <field name="asaas_customer_id"/>
+                            <field name="asaas_subscription_id"/>
+                            <field name="is_delinquent" readonly="1"/>
+                            <field name="is_adimplente_active" readonly="1"/>
+                        </group>
+                    </group>
+                    <group
+                        string="Juros, multa e desconto (Asaas)"
+                        name="wellhub_asaas_fees"
+                    >
+                        <group string="Desconto">
+                            <field name="asaas_discount_type"/>
+                            <field
+                                name="asaas_discount_value"
+                                invisible="asaas_discount_type == 'none'"
+                            />
+                            <field
+                                name="asaas_discount_due_date_limit_days"
+                                invisible="asaas_discount_type == 'none'"
+                            />
+                        </group>
+                        <group string="Juros e multa">
+                            <field name="asaas_interest_monthly_percent"/>
+                            <field name="asaas_fine_type"/>
+                            <field
+                                name="asaas_fine_value"
+                                invisible="asaas_fine_type == 'none'"
+                            />
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_wellhub_collaborator_search" model="ir.ui.view">
+        <field name="name">wellhub.collaborator.search</field>
+        <field name="model">wellhub.collaborator</field>
+        <field name="arch" type="xml">
+            <search string="Colaboradores Wellhub">
+                <field name="name"/>
+                <field name="email"/>
+                <field name="phone"/>
+                <field name="cpf_cnpj"/>
+                <separator/>
+                <filter
+                    string="Aguardando e-mail (portal)"
+                    name="filter_signup_pending"
+                    domain="[('signup_pending', '=', True)]"
+                />
+                <filter
+                    string="Assinatura ativa"
+                    name="filter_subscription_active"
+                    domain="[('wellhub_subscription_active', '=', True)]"
+                />
+                <filter
+                    string="Adimplentes (assinatura ativa)"
+                    name="filter_adimplente"
+                    domain="[('is_adimplente_active', '=', True)]"
+                />
+                <filter
+                    string="Inadimplentes"
+                    name="filter_delinquent"
+                    domain="[('is_delinquent', '=', True)]"
+                />
+                <group expand="0" string="Agrupar por">
+                    <filter string="Empresa" name="group_company" context="{'group_by': 'company_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_wellhub_collaborator" model="ir.actions.act_window">
+        <field name="name">Colaboradores Wellhub</field>
+        <field name="res_model">wellhub.collaborator</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_wellhub_collaborator_search"/>
+        <field name="context">{}</field>
+    </record>
+</odoo>

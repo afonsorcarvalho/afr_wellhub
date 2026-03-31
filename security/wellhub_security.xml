@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="module_category_afr_wellhub" model="ir.module.category">
+        <field name="name">Wellhub</field>
+        <field name="description">Colaboradores Wellhub e integração Asaas</field>
+    </record>
+
+    <record id="group_afr_wellhub_user" model="res.groups">
+        <field name="name">Wellhub / Usuário</field>
+        <field name="category_id" ref="module_category_afr_wellhub"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+    <record id="group_afr_wellhub_manager" model="res.groups">
+        <field name="name">Wellhub / Gestor</field>
+        <field name="category_id" ref="module_category_afr_wellhub"/>
+        <field name="implied_ids" eval="[(4, ref('group_afr_wellhub_user'))]"/>
+    </record>
+
+    <record id="wellhub_collaborator_company_rule" model="ir.rule">
+        <field name="name">Wellhub colaborador multi-empresa</field>
+        <field name="model_id" ref="model_wellhub_collaborator"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="wellhub_payment_company_rule" model="ir.rule">
+        <field name="name">Wellhub cobrança multi-empresa</field>
+        <field name="model_id" ref="model_wellhub_asaas_payment"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+</odoo>

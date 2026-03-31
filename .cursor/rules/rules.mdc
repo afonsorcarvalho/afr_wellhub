@@ -1,0 +1,10 @@
+---
+description: Addon afr_wellhub — alinhado ao Docker local do workspace
+globs: afr_wellhub/**/*
+alwaysApply: false
+---
+
+# afr_wellhub
+
+- **Upgrade do módulo:** seguir a regra do workspace que exige **sempre** atualizar pelo **Docker local** (ver `addons/.cursor/rules/odoo-docker-upgrade-local.mdc`; na abertura da raiz `odoo18_teste/`, também `odoo-docker-upgrade-teste-local.mdc`).
+- Após alterações neste addon, executar `-u afr_wellhub` via `docker compose` no stack (serviço `web`), com o banco correto.

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem
+        id="menu_afr_wellhub_root"
+        name="Wellhub"
+        groups="afr_wellhub.group_afr_wellhub_user"
+        sequence="80"
+    />
+    <menuitem
+        id="menu_wellhub_collaborator"
+        name="Colaboradores"
+        parent="menu_afr_wellhub_root"
+        action="action_wellhub_collaborator"
+        sequence="10"
+    />
+    <menuitem
+        id="menu_wellhub_asaas_payment"
+        name="Cobranças Asaas"
+        parent="menu_afr_wellhub_root"
+        action="action_wellhub_asaas_payment"
+        sequence="20"
+        groups="afr_wellhub.group_afr_wellhub_manager"
+    />
+</odoo>

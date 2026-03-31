@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="portal_wellhub_inscricao_form" name="Wellhub: formulário de inscrição">
+        <t t-call="website.layout">
+            <div id="wrap" class="oe_structure">
+                <section class="pt-5 pb-5">
+                    <div class="container">
+                        <div class="row justify-content-center">
+                            <div class="col-lg-6 col-md-8">
+                                <h1 class="mb-4">Inscrição Wellhub</h1>
+                                <p class="text-muted mb-4">
+                                    Preencha os dados abaixo. Enviaremos um e-mail com um link para confirmar o endereço e ativar a sua inscrição colaborador Wellhub.
+                                </p>
+                                <div t-if="error" class="alert alert-danger" role="alert">
+                                    <t t-out="error"/>
+                                </div>
+                                <form action="/afr_wellhub/inscricao" method="post" class="o_mark_required wellhub_portal_inscricao_form">
+                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                    <div class="mb-3">
+                                        <label class="form-label" for="wh_name">Nome completo</label>
+                                        <input type="text" class="form-control" id="wh_name" name="name" required="required"
+                                               autocomplete="name"
+                                               t-att-value="values.get('name') or ''"/>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label" for="wh_email">E-mail</label>
+                                        <input type="email" class="form-control" id="wh_email" name="email" required="required"
+                                               autocomplete="email" inputmode="email"
+                                               t-att-value="values.get('email') or ''"/>
+                                        <div class="form-text">Será validado no envio e usado para o link de confirmação.</div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label" for="wh_phone">Telefone (com DDD)</label>
+                                        <input type="text" class="form-control" id="wh_phone" name="phone" required="required"
+                                               placeholder="(00) 00000-0000"
+                                               t-att-value="values.get('phone') or ''"/>
+                                        <div class="form-text">10 dígitos (fixo) ou 11 (celular), com máscara.</div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label" for="wh_cpf">CPF</label>
+                                        <input type="text" class="form-control" id="wh_cpf" name="cpf_cnpj" required="required"
+                                               placeholder="000.000.000-00"
+                                               t-att-value="values.get('cpf_cnpj') or ''"/>
+                                        <div class="form-text">Apenas números; validação dos dígitos verificadores no envio.</div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Enviar inscrição</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </t>
+    </template>
+
+    <template id="portal_wellhub_inscricao_done" name="Wellhub: inscrição enviada">
+        <t t-call="website.layout">
+            <div id="wrap" class="oe_structure">
+                <section class="pt-5 pb-5">
+                    <div class="container">
+                        <div class="row justify-content-center">
+                            <div class="col-lg-6 col-md-8">
+                                <h1 class="mb-4">Verifique o seu e-mail</h1>
+                                <div class="alert alert-success" role="alert">
+                                    <p class="mb-0">
+                                        Enviamos uma mensagem para <strong t-out="email"/>.
+                                        Abra o link recebido para confirmar a inscrição colaborador Wellhub</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </t>
+    </template>
+
+    <template id="portal_wellhub_ativar_result" name="Wellhub: resultado da ativação">
+        <t t-call="website.layout">
+            <div id="wrap" class="oe_structure">
+                <section class="pt-5 pb-5">
+                    <div class="container">
+                        <div class="row justify-content-center">
+                            <div class="col-lg-10 col-md-11">
+                                <h1 class="mb-4">Ativação da inscrição</h1>
+                                <div class="alert alert-success" role="alert" t-if="ok">
+                                    <div class="mb-0" style="white-space: pre-line" t-out="message"/>
+                                </div>
+                                <div class="alert alert-warning" role="alert" t-if="not ok">
+                                    <p class="mb-0" t-out="message"/>
+                                </div>
+                                <!-- Destaque: e-mail da cobrança e conclusão com pagamento -->
+                                <div
+                                    class="card border-primary border-2 shadow-sm mt-4 mb-2"
+                                    t-if="ok"
+                                    role="region"
+                                    aria-label="Próximos passos após a ativação"
+                                >
+                                    <div class="card-header bg-success py-3">
+                                        <h2 class="h5 mb-0 text-white fw-bold">
+                                            Próximos passos — leia com atenção
+                                        </h2>
+                                    </div>
+                                    <div class="card-body">
+                                        <ol class="mb-0 ps-3 lh-lg">
+                                            <li class="mb-3">
+                                                <strong>Verifique o seu e-mail</strong>
+                                                (o mesmo cadastrado na inscrição). A plataforma Asaas envia nesse endereço
+                                                a mensagem com o link da cobrança criada. Confira também a pasta de spam ou promoções.
+                                            </li>
+                                            <li class="mb-0">
+                                                <strong>A ativação da sua inscrição só fica concluída após o pagamento</strong>
+                                                
+                                                Acesse o link recebido por e-mail, abra a cobrança na Asaas e finalize o pagamento
+                                                conforme as instruções na página.
+                                            </li>
+                                        </ol>
+                                    </div>
+                                </div>
+                                <!-- Prévia do e-mail de cobrança Asaas (layout alinhado ao enviado pela plataforma) -->
+                                <div class="mt-4" t-if="ok and show_asaas_email_preview">
+                                    <p class="text-muted small mb-3">
+                                        <strong>Exemplo ilustrativo</strong> do e-mail que a Asaas envia quando a cobrança é criada.
+                                        Os valores abaixo refletem a sua assinatura atual; o link real para pagar ou visualizar a cobrança
+                                        chega <strong>somente</strong> na mensagem enviada ao seu e-mail.
+                                    </p>
+                                    <div
+                                        class="rounded-2 shadow-sm overflow-hidden mx-auto"
+                                        style="max-width: 640px; font-family: Arial, Helvetica, sans-serif; font-size: 15px; color: #222;"
+                                    >
+                                        <div style="background-color: #0d2847; color: #fff; padding: 22px 20px;">
+                                            <div style="font-size: 16px; font-weight: 600;" t-out="preview_company_name"/>
+                                            <div style="font-size: 14px; margin-top: 6px; opacity: 0.95;" t-out="preview_company_cnpj"/>
+                                        </div>
+                                        <div style="background: #fff; padding: 26px 22px;">
+                                            <h2 class="text-center fw-bold mb-2" style="font-size: 1.15rem;">Cobrança criada</h2>
+                                            <hr class="my-3" style="border-color: #ddd;"/>
+                                            <p class="mb-3">
+                                                Olá, <t t-out="preview_customer_name"/>
+                                            </p>
+                                            <p class="mb-3 lh-base">
+                                                <span t-out="preview_company_name"/>
+                                                gerou uma cobrança para você, no valor de
+                                                <strong t-out="preview_amount_str"/>
+                                                com vencimento em
+                                                <strong t-out="preview_due_str"/>.
+                                            </p>
+                                            <p class="mb-2 fw-bold">Descrição da cobrança:</p>
+                                            <p class="mb-4" t-out="preview_description"/>
+                                            <p class="mb-2 small text-muted">
+                                                Clique no botão abaixo para visualizar a cobrança. Ou acesse o link:
+                                            </p>
+                                            <p class="mb-4" style="word-break: break-all; font-size: 13px;">
+                                                <span t-out="preview_link_example"/>
+                                            </p>
+                                            <p class="text-muted fst-italic small mb-4">
+                                                (Formato ilustrativo — o endereço exato será o que a Asaas enviar no e-mail.)
+                                            </p>
+                                            <div class="text-center">
+                                                <span
+                                                    class="d-inline-block px-4 py-2 rounded-pill text-white fw-semibold"
+                                                    style="background-color: #00a86b; cursor: default; user-select: none;"
+                                                >
+                                                    Visualizar cobrança
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div
+                                            class="text-center small px-3 py-4 lh-base"
+                                            style="background-color: #f0f0f0; color: #444;"
+                                        >
+                                            <t t-foreach="preview_footer_lines" t-as="fline">
+                                                <div class="mb-0"><t t-out="fline"/></div>
+                                            </t>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </t>
+    </template>
+</odoo>

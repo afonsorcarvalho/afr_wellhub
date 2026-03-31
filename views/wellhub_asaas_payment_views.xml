@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_wellhub_asaas_payment_tree" model="ir.ui.view">
+        <field name="name">wellhub.asaas.payment.tree</field>
+        <field name="model">wellhub.asaas.payment</field>
+        <field name="arch" type="xml">
+            <list string="Cobranças Asaas" create="false">
+                <field name="asaas_payment_id"/>
+                <field name="collaborator_id"/>
+                <field name="status"/>
+                <field name="value"/>
+                <field name="due_date"/>
+                <field name="payment_date"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_wellhub_asaas_payment_form" model="ir.ui.view">
+        <field name="name">wellhub.asaas.payment.form</field>
+        <field name="model">wellhub.asaas.payment</field>
+        <field name="arch" type="xml">
+            <form string="Cobrança Asaas" create="false" edit="false">
+                <sheet>
+                    <group>
+                        <field name="asaas_payment_id"/>
+                        <field name="collaborator_id"/>
+                        <field name="status"/>
+                        <field name="value"/>
+                        <field name="net_value"/>
+                        <field name="due_date"/>
+                        <field name="payment_date"/>
+                        <field name="confirmation_date"/>
+                        <field name="asaas_customer_id"/>
+                        <field name="asaas_subscription_id"/>
+                        <field name="invoice_url" widget="url"/>
+                        <field name="bank_slip_url" widget="url"/>
+                        <field name="company_id" groups="base.group_multi_company"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_wellhub_asaas_payment_search" model="ir.ui.view">
+        <field name="name">wellhub.asaas.payment.search</field>
+        <field name="model">wellhub.asaas.payment</field>
+        <field name="arch" type="xml">
+            <search string="Cobranças Asaas">
+                <field name="asaas_payment_id"/>
+                <field name="collaborator_id"/>
+                <field name="status"/>
+                <separator/>
+                <filter
+                    string="Pagas (RECEIVED)"
+                    name="filter_received"
+                    domain="[('status', '=', 'RECEIVED')]"
+                />
+                <filter
+                    string="Em atraso (OVERDUE)"
+                    name="filter_overdue"
+                    domain="[('status', '=', 'OVERDUE')]"
+                />
+                <filter
+                    string="Pendentes (PENDING)"
+                    name="filter_pending"
+                    domain="[('status', '=', 'PENDING')]"
+                />
+            </search>
+        </field>
+    </record>
+
+    <record id="action_wellhub_asaas_payment" model="ir.actions.act_window">
+        <field name="name">Cobranças Asaas</field>
+        <field name="res_model">wellhub.asaas.payment</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_wellhub_asaas_payment_search"/>
+    </record>
+</odoo>
