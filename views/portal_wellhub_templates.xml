@@ -372,4 +372,127 @@
             </div>
         </t>
     </template>
+
+    <template id="portal_wellhub_reenviar_form" name="Wellhub: reenviar e-mail de ativação">
+        <t t-call="website.layout">
+            <div id="wrap" class="oe_structure wh-portal">
+                <t t-call="afr_wellhub.wh_icon_sprite"/>
+                <section class="wh-hero wh-hero--compact" aria-label="Reenviar e-mail de ativação">
+                    <div class="wh-hero__inner">
+                        <span class="wh-hero__badge">
+                            <svg aria-hidden="true" focusable="false" width="14" height="14"><use href="#wh-i-mail"/></svg>
+                            Reenviar confirmação
+                        </span>
+                        <h1 class="wh-hero__title">Reenviar link de ativação</h1>
+                        <p class="wh-hero__subtitle">Informe o e-mail cadastrado e enviaremos um novo link de confirmação.</p>
+                    </div>
+                </section>
+
+                <section class="wh-main">
+                    <div class="wh-main__inner">
+                        <div class="wh-success-card" style="max-width: 480px;">
+                            <div t-if="error" class="wh-alert wh-alert--danger" role="alert">
+                                <span class="wh-alert__icon" aria-hidden="true">
+                                    <svg><use href="#wh-i-x"/></svg>
+                                </span>
+                                <div class="wh-alert__body"><t t-out="error"/></div>
+                            </div>
+
+                            <form action="/afr_wellhub/inscricao/reenviar" method="post" class="wh-form" novalidate="novalidate">
+                                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+
+                                <div class="wh-field" data-wh-field="email" data-wh-status="idle">
+                                    <div class="wh-field__control">
+                                        <span class="wh-field__icon" aria-hidden="true">
+                                            <svg><use href="#wh-i-mail"/></svg>
+                                        </span>
+                                        <input type="email" class="wh-field__input" id="wh_reenviar_email"
+                                               name="email" required="required"
+                                               autocomplete="email" inputmode="email"
+                                               placeholder=" "
+                                               aria-describedby="wh_reenviar_email_feedback"/>
+                                        <label class="wh-field__label" for="wh_reenviar_email">E-mail cadastrado</label>
+                                        <span class="wh-field__status" aria-hidden="true">
+                                            <span class="wh-field__status-valid"><svg><use href="#wh-i-check"/></svg></span>
+                                            <span class="wh-field__status-invalid"><svg><use href="#wh-i-x"/></svg></span>
+                                        </span>
+                                    </div>
+                                    <small id="wh_reenviar_email_feedback" class="wh-field__feedback" aria-live="polite">
+                                        O mesmo e-mail usado no cadastro.
+                                    </small>
+                                </div>
+
+                                <button type="submit" class="wh-btn-primary" style="margin-top: 8px;">
+                                    <span class="wh-btn-primary__icon-idle" aria-hidden="true">
+                                        <svg width="20" height="20"><use href="#wh-i-arrow-right"/></svg>
+                                    </span>
+                                    <span class="wh-btn-primary__label-idle">Reenviar link</span>
+                                </button>
+                            </form>
+
+                            <p style="text-align:center; margin-top: 20px; font-size: 0.88rem;">
+                                <a href="/afr_wellhub/inscricao" style="color: var(--wh-primary);">← Voltar ao cadastro</a>
+                            </p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </t>
+    </template>
+
+    <template id="portal_wellhub_reenviar_done" name="Wellhub: reenvio solicitado">
+        <t t-call="website.layout">
+            <div id="wrap" class="oe_structure wh-portal">
+                <t t-call="afr_wellhub.wh_icon_sprite"/>
+                <section class="wh-hero wh-hero--compact" aria-label="Reenvio solicitado">
+                    <div class="wh-hero__inner">
+                        <span class="wh-hero__badge">
+                            <svg aria-hidden="true" focusable="false" width="14" height="14"><use href="#wh-i-check"/></svg>
+                            Solicitação enviada
+                        </span>
+                        <h1 class="wh-hero__title">Verifique o seu e-mail</h1>
+                        <p class="wh-hero__subtitle">Se houver inscrição pendente, o link foi reenviado.</p>
+                    </div>
+                </section>
+
+                <section class="wh-main">
+                    <div class="wh-main__inner">
+                        <div class="wh-success-card" style="max-width: 560px;">
+                            <div class="wh-success-card__icon" aria-hidden="true">
+                                <svg viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle class="wh-success-draw-ring" cx="28" cy="28" r="26"/>
+                                    <path class="wh-success-draw-check" d="m16 28 8 8 16-18"/>
+                                </svg>
+                            </div>
+                            <h2 class="wh-success-card__title">Solicitação recebida</h2>
+                            <p class="wh-success-card__body">
+                                Se houver uma inscrição pendente para esse e-mail, enviaremos o link de ativação em instantes.
+                                Verifique a <strong>caixa de entrada</strong>, <strong>spam</strong> e <strong>promoções</strong>.
+                            </p>
+
+                            <ol class="wh-tips" aria-label="Próximos passos">
+                                <li class="wh-tips__item">
+                                    <span class="wh-tips__num">1</span>
+                                    <p class="wh-tips__text">Aguarde alguns minutos e verifique o <strong>e-mail cadastrado</strong>.</p>
+                                </li>
+                                <li class="wh-tips__item">
+                                    <span class="wh-tips__num">2</span>
+                                    <p class="wh-tips__text">Cheque também <strong>spam</strong> e <strong>promoções</strong>.</p>
+                                </li>
+                                <li class="wh-tips__item">
+                                    <span class="wh-tips__num">3</span>
+                                    <p class="wh-tips__text"><strong>Clique no link</strong> recebido para ativar a inscrição.</p>
+                                </li>
+                            </ol>
+
+                            <a class="wh-btn-secondary" href="/">
+                                <svg width="16" height="16" aria-hidden="true" style="transform: rotate(180deg);"><use href="#wh-i-arrow-right"/></svg>
+                                Voltar ao site
+                            </a>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </t>
+    </template>
 </odoo>
