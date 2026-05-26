@@ -258,6 +258,13 @@
                                 <svg width="16" height="16" aria-hidden="true" style="transform: rotate(180deg);"><use href="#wh-i-arrow-right"/></svg>
                                 Voltar ao site
                             </a>
+
+                            <p style="margin-top: 20px; font-size: 0.88rem; color: var(--wh-ink-500);">
+                                Não recebeu o e-mail?
+                                <a href="/afr_wellhub/inscricao/reenviar" style="color: var(--wh-primary); font-weight: 600;">
+                                    Reenviar link de ativação →
+                                </a>
+                            </p>
                         </div>
                     </div>
                 </section>
