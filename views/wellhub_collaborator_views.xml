@@ -42,11 +42,11 @@
                     <button
                         name="action_resend_signup_confirmation_email"
                         type="object"
-                        string="Reenviar e-mail de confirmação"
+                        string="📧 Reenviar e-mail"
                         class="btn-secondary"
-                        invisible="wellhub_subscription_enrolled"
+                        invisible="not signup_pending"
                         groups="afr_wellhub.group_afr_wellhub_manager"
-                        help="Reenvia o link de ativação da inscrição pelo portal. Só tem efeito se houver inscrição pendente de confirmação por e-mail."
+                        help="Reenvia o link de ativação para o colaborador. Token renova com validade de 48h."
                     />
                 </header>
                 <sheet>
