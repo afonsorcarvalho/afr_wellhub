@@ -389,6 +389,7 @@ class AfrWellhubAsaasApi(models.AbstractModel):
             "cycle": cycle,
             "description": _("[Assinatura recorrente Wellhub] %s") % collaborator.name,
             "externalReference": collaborator._asaas_subscription_external_reference(),
+            "notifyCustomer": True,
         }
         # discount, interest, fine — opcionais na API Criar nova assinatura.
         payload.update(collaborator._asaas_subscription_discount_interest_fine_payload())

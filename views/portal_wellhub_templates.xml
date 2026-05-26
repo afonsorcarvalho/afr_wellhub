@@ -1,50 +1,205 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Sprite SVG: ícones inline reutilizados pelos templates do portal. -->
+    <template id="wh_icon_sprite" name="Wellhub: sprite de ícones SVG">
+        <svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true" focusable="false">
+            <symbol id="wh-i-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="8" r="4"/>
+                <path d="M4 21c0-4.418 3.582-8 8-8s8 3.582 8 8"/>
+            </symbol>
+            <symbol id="wh-i-mail" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="5" width="18" height="14" rx="2"/>
+                <path d="m3 7 9 6 9-6"/>
+            </symbol>
+            <symbol id="wh-i-phone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 16.92V20a2 2 0 0 1-2.18 2A19.8 19.8 0 0 1 2 4.18 2 2 0 0 1 4 2h3.08a2 2 0 0 1 2 1.72c.12.89.33 1.76.62 2.6a2 2 0 0 1-.45 2.11L8 9.76a16 16 0 0 0 6.24 6.24l1.33-1.25a2 2 0 0 1 2.11-.45c.84.29 1.71.5 2.6.62a2 2 0 0 1 1.72 2z"/>
+            </symbol>
+            <symbol id="wh-i-id-card" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2.5" y="5" width="19" height="14" rx="2"/>
+                <circle cx="8.5" cy="12" r="2.2"/>
+                <path d="M13 10h6M13 14h4M5.5 17.2c.8-1.4 2-2.2 3-2.2s2.2.8 3 2.2"/>
+            </symbol>
+            <symbol id="wh-i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m5 12 5 5L20 7"/>
+            </symbol>
+            <symbol id="wh-i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 6l12 12M18 6 6 18"/>
+            </symbol>
+            <symbol id="wh-i-spinner" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+                <path d="M12 3a9 9 0 1 0 9 9" opacity=".35"/>
+                <path d="M21 12a9 9 0 0 0-9-9"/>
+            </symbol>
+            <symbol id="wh-i-arrow-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 12h14M13 5l7 7-7 7"/>
+            </symbol>
+            <symbol id="wh-i-sparkle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 3v4M12 17v4M3 12h4M17 12h4M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8M18.4 5.6l-2.8 2.8M8.4 15.6l-2.8 2.8"/>
+            </symbol>
+            <symbol id="wh-i-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="9"/>
+                <path d="M12 8h.01M11 12h1v5h1"/>
+            </symbol>
+            <symbol id="wh-i-play" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M8 5v14l11-7z"/>
+            </symbol>
+        </svg>
+    </template>
+
     <template id="portal_wellhub_inscricao_form" name="Wellhub: formulário de inscrição">
         <t t-call="website.layout">
-            <div id="wrap" class="oe_structure">
-                <section class="pt-5 pb-5">
-                    <div class="container">
-                        <div class="row justify-content-center">
-                            <div class="col-lg-6 col-md-8">
-                                <h1 class="mb-4">Inscrição Wellhub</h1>
-                                <p class="text-muted mb-4">
-                                    Preencha os dados abaixo. Enviaremos um e-mail com um link para confirmar o endereço e ativar a sua inscrição colaborador Wellhub.
-                                </p>
-                                <div t-if="error" class="alert alert-danger" role="alert">
-                                    <t t-out="error"/>
+            <div id="wrap" class="oe_structure wh-portal">
+                <t t-call="afr_wellhub.wh_icon_sprite"/>
+                <section class="wh-hero" aria-label="Cabeçalho Inscrição Wellhub">
+                    <div class="wh-hero__inner">
+                        <span class="wh-hero__badge">
+                            <svg aria-hidden="true" focusable="false" width="14" height="14"><use href="#wh-i-sparkle"/></svg>
+                            Benefício Wellhub
+                        </span>
+                        <h1 class="wh-hero__title">Ative sua inscrição colaborador</h1>
+                        <p class="wh-hero__subtitle">
+                            Preencha seus dados para receber o link de confirmação por e-mail e concluir a sua inscrição no benefício Wellhub.
+                        </p>
+                    </div>
+                </section>
+
+                <section class="wh-main">
+                    <div class="wh-main__inner">
+                        <div class="wh-card">
+                            <div class="wh-card__grid">
+                                <div class="wh-form-wrap">
+                                    <div t-if="error" class="wh-alert wh-alert--danger" role="alert">
+                                        <span class="wh-alert__icon" aria-hidden="true">
+                                            <svg><use href="#wh-i-x"/></svg>
+                                        </span>
+                                        <div class="wh-alert__body">
+                                            <t t-out="error"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="wh-progress" aria-hidden="true">
+                                        <span class="wh-progress__label"><span class="wh-progress__count">0</span> de 4</span>
+                                        <div class="wh-progress__bar"/>
+                                    </div>
+
+                                    <form action="/afr_wellhub/inscricao" method="post" class="wellhub_portal_inscricao_form wh-form" novalidate="novalidate">
+                                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+
+                                        <div class="wh-field" data-wh-field="name" data-wh-status="idle">
+                                            <div class="wh-field__control">
+                                                <span class="wh-field__icon" aria-hidden="true">
+                                                    <svg><use href="#wh-i-user"/></svg>
+                                                </span>
+                                                <input type="text" class="wh-field__input" id="wh_name" name="name" required="required"
+                                                       autocomplete="name"
+                                                       placeholder=" "
+                                                       aria-describedby="wh_name_feedback"
+                                                       t-att-value="values.get('name') or ''"/>
+                                                <label class="wh-field__label" for="wh_name">Nome completo</label>
+                                                <span class="wh-field__status" aria-hidden="true">
+                                                    <span class="wh-field__status-valid"><svg><use href="#wh-i-check"/></svg></span>
+                                                    <span class="wh-field__status-invalid"><svg><use href="#wh-i-x"/></svg></span>
+                                                </span>
+                                            </div>
+                                            <small id="wh_name_feedback" class="wh-field__feedback" aria-live="polite"></small>
+                                        </div>
+
+                                        <div class="wh-field" data-wh-field="email" data-wh-status="idle">
+                                            <div class="wh-field__control">
+                                                <span class="wh-field__icon" aria-hidden="true">
+                                                    <svg><use href="#wh-i-mail"/></svg>
+                                                </span>
+                                                <input type="email" class="wh-field__input" id="wh_email" name="email" required="required"
+                                                       autocomplete="email" inputmode="email"
+                                                       placeholder=" "
+                                                       aria-describedby="wh_email_feedback"
+                                                       t-att-value="values.get('email') or ''"/>
+                                                <label class="wh-field__label" for="wh_email">E-mail</label>
+                                                <span class="wh-field__status" aria-hidden="true">
+                                                    <span class="wh-field__status-valid"><svg><use href="#wh-i-check"/></svg></span>
+                                                    <span class="wh-field__status-invalid"><svg><use href="#wh-i-x"/></svg></span>
+                                                </span>
+                                            </div>
+                                            <small id="wh_email_feedback" class="wh-field__feedback" aria-live="polite">Será usado para o link de confirmação.</small>
+                                        </div>
+
+                                        <div class="wh-field" data-wh-field="phone" data-wh-status="idle">
+                                            <div class="wh-field__control">
+                                                <span class="wh-field__icon" aria-hidden="true">
+                                                    <svg><use href="#wh-i-phone"/></svg>
+                                                </span>
+                                                <input type="text" class="wh-field__input" id="wh_phone" name="phone" required="required"
+                                                       placeholder=" "
+                                                       aria-describedby="wh_phone_feedback"
+                                                       t-att-value="values.get('phone') or ''"/>
+                                                <label class="wh-field__label" for="wh_phone">Telefone (com DDD)</label>
+                                                <span class="wh-field__status" aria-hidden="true">
+                                                    <span class="wh-field__status-valid"><svg><use href="#wh-i-check"/></svg></span>
+                                                    <span class="wh-field__status-invalid"><svg><use href="#wh-i-x"/></svg></span>
+                                                </span>
+                                            </div>
+                                            <small id="wh_phone_feedback" class="wh-field__feedback" aria-live="polite">10 dígitos (fixo) ou 11 (celular).</small>
+                                        </div>
+
+                                        <div class="wh-field" data-wh-field="cpf" data-wh-status="idle">
+                                            <div class="wh-field__control">
+                                                <span class="wh-field__icon" aria-hidden="true">
+                                                    <svg><use href="#wh-i-id-card"/></svg>
+                                                </span>
+                                                <input type="text" class="wh-field__input" id="wh_cpf" name="cpf_cnpj" required="required"
+                                                       placeholder=" "
+                                                       aria-describedby="wh_cpf_feedback"
+                                                       t-att-value="values.get('cpf_cnpj') or ''"/>
+                                                <label class="wh-field__label" for="wh_cpf">CPF</label>
+                                                <span class="wh-field__status" aria-hidden="true">
+                                                    <span class="wh-field__status-valid"><svg><use href="#wh-i-check"/></svg></span>
+                                                    <span class="wh-field__status-invalid"><svg><use href="#wh-i-x"/></svg></span>
+                                                </span>
+                                            </div>
+                                            <small id="wh_cpf_feedback" class="wh-field__feedback" aria-live="polite">Validação pelos dígitos verificadores.</small>
+                                        </div>
+
+                                        <button type="submit" class="wh-btn-primary" data-state="idle" disabled="disabled">
+                                            <span class="wh-btn-primary__icon-idle" aria-hidden="true">
+                                                <svg width="20" height="20"><use href="#wh-i-arrow-right"/></svg>
+                                            </span>
+                                            <span class="wh-btn-primary__icon-loading" aria-hidden="true">
+                                                <svg width="20" height="20"><use href="#wh-i-spinner"/></svg>
+                                            </span>
+                                            <span class="wh-btn-primary__icon-success" aria-hidden="true">
+                                                <svg width="20" height="20"><use href="#wh-i-check"/></svg>
+                                            </span>
+                                            <span class="wh-btn-primary__label-idle">Enviar inscrição</span>
+                                            <span class="wh-btn-primary__label-loading">Enviando…</span>
+                                            <span class="wh-btn-primary__label-success">Pronto!</span>
+                                        </button>
+                                    </form>
                                 </div>
-                                <form action="/afr_wellhub/inscricao" method="post" class="o_mark_required wellhub_portal_inscricao_form">
-                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
-                                    <div class="mb-3">
-                                        <label class="form-label" for="wh_name">Nome completo</label>
-                                        <input type="text" class="form-control" id="wh_name" name="name" required="required"
-                                               autocomplete="name"
-                                               t-att-value="values.get('name') or ''"/>
+
+                                <aside class="wh-media" aria-label="Vídeo promocional Wellhub">
+                                    <span class="wh-media__eyebrow">
+                                        <svg width="12" height="12" aria-hidden="true"><use href="#wh-i-play"/></svg>
+                                        Vídeo promocional
+                                    </span>
+                                    <p class="wh-media__title">Conheça o benefício em 30 segundos</p>
+                                    <p class="wh-media__caption">Acesse academias, estúdios e apps de bem-estar em todo o Brasil.</p>
+                                    <div class="wh-video-frame">
+                                        <video
+                                            id="wh_promo_video"
+                                            controls="controls"
+                                            playsinline="playsinline"
+                                            autoplay="autoplay"
+                                            loop="loop"
+                                            preload="auto"
+                                            aria-label="Vídeo promocional Wellhub"
+                                        >
+                                            <source
+                                                src="/afr_wellhub/static/video/Monacoframe_Wellhub_16x9_1_BR.mp4"
+                                                type="video/mp4"
+                                            />
+                                            O seu navegador não suporta reprodução de vídeo HTML5.
+                                        </video>
                                     </div>
-                                    <div class="mb-3">
-                                        <label class="form-label" for="wh_email">E-mail</label>
-                                        <input type="email" class="form-control" id="wh_email" name="email" required="required"
-                                               autocomplete="email" inputmode="email"
-                                               t-att-value="values.get('email') or ''"/>
-                                        <div class="form-text">Será validado no envio e usado para o link de confirmação.</div>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label" for="wh_phone">Telefone (com DDD)</label>
-                                        <input type="text" class="form-control" id="wh_phone" name="phone" required="required"
-                                               placeholder="(00) 00000-0000"
-                                               t-att-value="values.get('phone') or ''"/>
-                                        <div class="form-text">10 dígitos (fixo) ou 11 (celular), com máscara.</div>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label" for="wh_cpf">CPF</label>
-                                        <input type="text" class="form-control" id="wh_cpf" name="cpf_cnpj" required="required"
-                                               placeholder="000.000.000-00"
-                                               t-att-value="values.get('cpf_cnpj') or ''"/>
-                                        <div class="form-text">Apenas números; validação dos dígitos verificadores no envio.</div>
-                                    </div>
-                                    <button type="submit" class="btn btn-primary">Enviar inscrição</button>
-                                </form>
+                                </aside>
                             </div>
                         </div>
                     </div>
@@ -55,18 +210,54 @@
 
     <template id="portal_wellhub_inscricao_done" name="Wellhub: inscrição enviada">
         <t t-call="website.layout">
-            <div id="wrap" class="oe_structure">
-                <section class="pt-5 pb-5">
-                    <div class="container">
-                        <div class="row justify-content-center">
-                            <div class="col-lg-6 col-md-8">
-                                <h1 class="mb-4">Verifique o seu e-mail</h1>
-                                <div class="alert alert-success" role="alert">
-                                    <p class="mb-0">
-                                        Enviamos uma mensagem para <strong t-out="email"/>.
-                                        Abra o link recebido para confirmar a inscrição colaborador Wellhub</p>
-                                </div>
+            <div id="wrap" class="oe_structure wh-portal">
+                <t t-call="afr_wellhub.wh_icon_sprite"/>
+                <section class="wh-hero wh-hero--compact" aria-label="Cabeçalho inscrição enviada">
+                    <div class="wh-hero__inner">
+                        <span class="wh-hero__badge">
+                            <svg aria-hidden="true" focusable="false" width="14" height="14"><use href="#wh-i-mail"/></svg>
+                            Confirmação a caminho
+                        </span>
+                        <h1 class="wh-hero__title">Inscrição quase pronta</h1>
+                        <p class="wh-hero__subtitle">Falta só um passo para ativar o seu benefício Wellhub.</p>
+                    </div>
+                </section>
+
+                <section class="wh-main">
+                    <div class="wh-main__inner">
+                        <div class="wh-success-card">
+                            <div class="wh-success-card__icon" aria-hidden="true">
+                                <svg viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle class="wh-success-draw-ring" cx="28" cy="28" r="26"/>
+                                    <path class="wh-success-draw-check" d="m16 28 8 8 16-18"/>
+                                </svg>
                             </div>
+                            <h2 class="wh-success-card__title">Verifique o seu e-mail</h2>
+                            <p class="wh-success-card__body">
+                                Enviamos uma mensagem com o link de confirmação para
+                                <span class="wh-pill"><t t-out="email"/></span>.
+                                Abra o link para ativar a inscrição colaborador Wellhub.
+                            </p>
+
+                            <ol class="wh-tips" aria-label="Dicas para localizar o e-mail">
+                                <li class="wh-tips__item">
+                                    <span class="wh-tips__num">1</span>
+                                    <p class="wh-tips__text">Procure na <strong>caixa de entrada</strong> uma mensagem com o assunto de confirmação.</p>
+                                </li>
+                                <li class="wh-tips__item">
+                                    <span class="wh-tips__num">2</span>
+                                    <p class="wh-tips__text">Se não aparecer em alguns minutos, cheque <strong>spam</strong> e <strong>promoções</strong>.</p>
+                                </li>
+                                <li class="wh-tips__item">
+                                    <span class="wh-tips__num">3</span>
+                                    <p class="wh-tips__text"><strong>Clique no link</strong> recebido para ativar a inscrição.</p>
+                                </li>
+                            </ol>
+
+                            <a class="wh-btn-secondary" href="/">
+                                <svg width="16" height="16" aria-hidden="true" style="transform: rotate(180deg);"><use href="#wh-i-arrow-right"/></svg>
+                                Voltar ao site
+                            </a>
                         </div>
                     </div>
                 </section>
@@ -76,103 +267,103 @@
 
     <template id="portal_wellhub_ativar_result" name="Wellhub: resultado da ativação">
         <t t-call="website.layout">
-            <div id="wrap" class="oe_structure">
-                <section class="pt-5 pb-5">
-                    <div class="container">
-                        <div class="row justify-content-center">
-                            <div class="col-lg-10 col-md-11">
-                                <h1 class="mb-4">Ativação da inscrição</h1>
-                                <div class="alert alert-success" role="alert" t-if="ok">
-                                    <div class="mb-0" style="white-space: pre-line" t-out="message"/>
+            <div id="wrap" class="oe_structure wh-portal">
+                <t t-call="afr_wellhub.wh_icon_sprite"/>
+                <section class="wh-hero wh-hero--compact" aria-label="Resultado da ativação">
+                    <div class="wh-hero__inner">
+                        <span class="wh-hero__badge">
+                            <svg aria-hidden="true" focusable="false" width="14" height="14"><use href="#wh-i-sparkle"/></svg>
+                            Ativação
+                        </span>
+                        <h1 class="wh-hero__title">Ativação da inscrição</h1>
+                        <p class="wh-hero__subtitle" t-if="ok">Sua inscrição foi confirmada. Finalize o pagamento para concluir.</p>
+                        <p class="wh-hero__subtitle" t-if="not ok">Não conseguimos confirmar sua ativação. Veja os detalhes abaixo.</p>
+                    </div>
+                </section>
+
+                <section class="wh-main">
+                    <div class="wh-main__inner">
+                        <div class="wh-alert wh-alert--success" role="status" t-if="ok">
+                            <span class="wh-alert__icon" aria-hidden="true">
+                                <svg><use href="#wh-i-check"/></svg>
+                            </span>
+                            <div class="wh-alert__body" t-out="message"/>
+                        </div>
+
+                        <div class="wh-alert wh-alert--warning" role="alert" t-if="not ok">
+                            <span class="wh-alert__icon" aria-hidden="true">
+                                <svg><use href="#wh-i-info"/></svg>
+                            </span>
+                            <div class="wh-alert__body" t-out="message"/>
+                        </div>
+
+                        <div class="wh-steps-card" t-if="ok" aria-label="Próximos passos após a ativação">
+                            <h2 class="wh-steps-card__title">Próximos passos — leia com atenção</h2>
+                            <ol class="wh-steps">
+                                <li class="wh-steps__item">
+                                    <strong>Verifique o seu e-mail</strong> (o mesmo cadastrado na inscrição). A plataforma Asaas envia nesse endereço a mensagem com o link da cobrança criada. Confira também a pasta de spam ou promoções.
+                                </li>
+                                <li class="wh-steps__item">
+                                    <strong>A ativação da sua inscrição só fica concluída após o pagamento.</strong>
+                                    Acesse o link recebido por e-mail, abra a cobrança na Asaas e finalize o pagamento conforme as instruções na página.
+                                </li>
+                            </ol>
+                        </div>
+
+                        <!-- Prévia do e-mail de cobrança Asaas (layout fiel ao enviado pela plataforma; preservado). -->
+                        <div class="wh-preview-wrap" t-if="ok and show_asaas_email_preview">
+                            <p class="wh-preview-note">
+                                <strong>Exemplo ilustrativo</strong> do e-mail que a Asaas envia quando a cobrança é criada.
+                                Os valores refletem sua assinatura atual; o link real chega <strong>somente</strong> na mensagem enviada ao seu e-mail.
+                            </p>
+                            <div
+                                class="rounded-2 shadow-sm overflow-hidden mx-auto"
+                                style="max-width: 640px; font-family: Arial, Helvetica, sans-serif; font-size: 15px; color: #222;"
+                            >
+                                <div style="background-color: #0d2847; color: #fff; padding: 22px 20px;">
+                                    <div style="font-size: 16px; font-weight: 600;" t-out="preview_company_name"/>
+                                    <div style="font-size: 14px; margin-top: 6px; opacity: 0.95;" t-out="preview_company_cnpj"/>
                                 </div>
-                                <div class="alert alert-warning" role="alert" t-if="not ok">
-                                    <p class="mb-0" t-out="message"/>
-                                </div>
-                                <!-- Destaque: e-mail da cobrança e conclusão com pagamento -->
-                                <div
-                                    class="card border-primary border-2 shadow-sm mt-4 mb-2"
-                                    t-if="ok"
-                                    role="region"
-                                    aria-label="Próximos passos após a ativação"
-                                >
-                                    <div class="card-header bg-success py-3">
-                                        <h2 class="h5 mb-0 text-white fw-bold">
-                                            Próximos passos — leia com atenção
-                                        </h2>
-                                    </div>
-                                    <div class="card-body">
-                                        <ol class="mb-0 ps-3 lh-lg">
-                                            <li class="mb-3">
-                                                <strong>Verifique o seu e-mail</strong>
-                                                (o mesmo cadastrado na inscrição). A plataforma Asaas envia nesse endereço
-                                                a mensagem com o link da cobrança criada. Confira também a pasta de spam ou promoções.
-                                            </li>
-                                            <li class="mb-0">
-                                                <strong>A ativação da sua inscrição só fica concluída após o pagamento</strong>
-                                                
-                                                Acesse o link recebido por e-mail, abra a cobrança na Asaas e finalize o pagamento
-                                                conforme as instruções na página.
-                                            </li>
-                                        </ol>
-                                    </div>
-                                </div>
-                                <!-- Prévia do e-mail de cobrança Asaas (layout alinhado ao enviado pela plataforma) -->
-                                <div class="mt-4" t-if="ok and show_asaas_email_preview">
-                                    <p class="text-muted small mb-3">
-                                        <strong>Exemplo ilustrativo</strong> do e-mail que a Asaas envia quando a cobrança é criada.
-                                        Os valores abaixo refletem a sua assinatura atual; o link real para pagar ou visualizar a cobrança
-                                        chega <strong>somente</strong> na mensagem enviada ao seu e-mail.
+                                <div style="background: #fff; padding: 26px 22px;">
+                                    <h2 class="text-center fw-bold mb-2" style="font-size: 1.15rem;">Cobrança criada</h2>
+                                    <hr class="my-3" style="border-color: #ddd;"/>
+                                    <p class="mb-3">
+                                        Olá, <t t-out="preview_customer_name"/>
                                     </p>
-                                    <div
-                                        class="rounded-2 shadow-sm overflow-hidden mx-auto"
-                                        style="max-width: 640px; font-family: Arial, Helvetica, sans-serif; font-size: 15px; color: #222;"
-                                    >
-                                        <div style="background-color: #0d2847; color: #fff; padding: 22px 20px;">
-                                            <div style="font-size: 16px; font-weight: 600;" t-out="preview_company_name"/>
-                                            <div style="font-size: 14px; margin-top: 6px; opacity: 0.95;" t-out="preview_company_cnpj"/>
-                                        </div>
-                                        <div style="background: #fff; padding: 26px 22px;">
-                                            <h2 class="text-center fw-bold mb-2" style="font-size: 1.15rem;">Cobrança criada</h2>
-                                            <hr class="my-3" style="border-color: #ddd;"/>
-                                            <p class="mb-3">
-                                                Olá, <t t-out="preview_customer_name"/>
-                                            </p>
-                                            <p class="mb-3 lh-base">
-                                                <span t-out="preview_company_name"/>
-                                                gerou uma cobrança para você, no valor de
-                                                <strong t-out="preview_amount_str"/>
-                                                com vencimento em
-                                                <strong t-out="preview_due_str"/>.
-                                            </p>
-                                            <p class="mb-2 fw-bold">Descrição da cobrança:</p>
-                                            <p class="mb-4" t-out="preview_description"/>
-                                            <p class="mb-2 small text-muted">
-                                                Clique no botão abaixo para visualizar a cobrança. Ou acesse o link:
-                                            </p>
-                                            <p class="mb-4" style="word-break: break-all; font-size: 13px;">
-                                                <span t-out="preview_link_example"/>
-                                            </p>
-                                            <p class="text-muted fst-italic small mb-4">
-                                                (Formato ilustrativo — o endereço exato será o que a Asaas enviar no e-mail.)
-                                            </p>
-                                            <div class="text-center">
-                                                <span
-                                                    class="d-inline-block px-4 py-2 rounded-pill text-white fw-semibold"
-                                                    style="background-color: #00a86b; cursor: default; user-select: none;"
-                                                >
-                                                    Visualizar cobrança
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <div
-                                            class="text-center small px-3 py-4 lh-base"
-                                            style="background-color: #f0f0f0; color: #444;"
+                                    <p class="mb-3 lh-base">
+                                        <span t-out="preview_company_name"/>
+                                        gerou uma cobrança para você, no valor de
+                                        <strong t-out="preview_amount_str"/>
+                                        com vencimento em
+                                        <strong t-out="preview_due_str"/>.
+                                    </p>
+                                    <p class="mb-2 fw-bold">Descrição da cobrança:</p>
+                                    <p class="mb-4" t-out="preview_description"/>
+                                    <p class="mb-2 small text-muted">
+                                        Clique no botão abaixo para visualizar a cobrança. Ou acesse o link:
+                                    </p>
+                                    <p class="mb-4" style="word-break: break-all; font-size: 13px;">
+                                        <span t-out="preview_link_example"/>
+                                    </p>
+                                    <p class="text-muted fst-italic small mb-4">
+                                        (Formato ilustrativo — o endereço exato será o que a Asaas enviar no e-mail.)
+                                    </p>
+                                    <div class="text-center">
+                                        <span
+                                            class="d-inline-block px-4 py-2 rounded-pill text-white fw-semibold"
+                                            style="background-color: #00a86b; cursor: default; user-select: none;"
                                         >
-                                            <t t-foreach="preview_footer_lines" t-as="fline">
-                                                <div class="mb-0"><t t-out="fline"/></div>
-                                            </t>
-                                        </div>
+                                            Visualizar cobrança
+                                        </span>
                                     </div>
+                                </div>
+                                <div
+                                    class="text-center small px-3 py-4 lh-base"
+                                    style="background-color: #f0f0f0; color: #444;"
+                                >
+                                    <t t-foreach="preview_footer_lines" t-as="fline">
+                                        <div class="mb-0"><t t-out="fline"/></div>
+                                    </t>
                                 </div>
                             </div>
                         </div>

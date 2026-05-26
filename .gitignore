@@ -3,3 +3,6 @@ __pycache__/
 *.py[cod]
 *$py.class
 *.so
+
+# Rascunhos/screenshots para o agente — não versionar
+drafts/

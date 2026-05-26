@@ -2,7 +2,7 @@
 {
     "name": "Wellhub / Asaas",
     "summary": "Colaboradores Wellhub e assinaturas recorrentes no Asaas",
-    "version": "18.0.1.4.0",
+    "version": "18.0.1.5.0",
     "category": "Services",
     "author": "AFR",
     "license": "LGPL-3",
@@ -10,6 +10,7 @@
     "external_dependencies": {"python": ["requests"]},
     "assets": {
         "web.assets_frontend": [
+            "afr_wellhub/static/src/scss/portal_wellhub.scss",
             "afr_wellhub/static/src/js/portal_wellhub_inscricao.js",
         ],
     },
