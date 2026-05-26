@@ -379,7 +379,7 @@ class AfrWellhubPortal(http.Controller):
         if not email_norm:
             return request.render(
                 "afr_wellhub.portal_wellhub_reenviar_form",
-                {"error": _("Informe um e-mail válido.")},
+                {"error": _("Informe um e-mail válido."), "email_value": email_raw},
             )
         Collab = request.env["wellhub.collaborator"].sudo()
         company = self._wellhub_company()

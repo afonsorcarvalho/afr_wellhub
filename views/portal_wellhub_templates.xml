@@ -417,7 +417,8 @@
                                                name="email" required="required"
                                                autocomplete="email" inputmode="email"
                                                placeholder=" "
-                                               aria-describedby="wh_reenviar_email_feedback"/>
+                                               aria-describedby="wh_reenviar_email_feedback"
+                                               t-att-value="email_value or ''"/>
                                         <label class="wh-field__label" for="wh_reenviar_email">E-mail cadastrado</label>
                                         <span class="wh-field__status" aria-hidden="true">
                                             <span class="wh-field__status-valid"><svg><use href="#wh-i-check"/></svg></span>
