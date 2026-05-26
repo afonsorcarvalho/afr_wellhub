@@ -351,3 +351,64 @@ class AfrWellhubPortal(http.Controller):
                 **preview,
             },
         )
+
+    @http.route(
+        "/afr_wellhub/inscricao/reenviar",
+        type="http",
+        auth="public",
+        website=True,
+        methods=["GET"],
+    )
+    def wellhub_inscricao_reenviar_get(self, **kwargs):
+        return request.render(
+            "afr_wellhub.portal_wellhub_reenviar_form",
+            {"error": None},
+        )
+
+    @http.route(
+        "/afr_wellhub/inscricao/reenviar",
+        type="http",
+        auth="public",
+        website=True,
+        methods=["POST"],
+        csrf=True,
+    )
+    def wellhub_inscricao_reenviar_post(self, **post):
+        email_raw = (post.get("email") or "").strip()
+        email_norm = email_normalize(email_raw, strict=False)
+        if not email_norm:
+            return request.render(
+                "afr_wellhub.portal_wellhub_reenviar_form",
+                {"error": _("Informe um e-mail válido.")},
+            )
+        Collab = request.env["wellhub.collaborator"].sudo()
+        company = self._wellhub_company()
+        collab = Collab.search(
+            [
+                ("email", "=ilike", email_norm),
+                ("signup_pending", "=", True),
+                ("company_id", "=", company.id),
+            ],
+            limit=1,
+        )
+        if collab:
+            try:
+                collab.with_context(afr_wellhub_skip_asaas_sync=True).write(
+                    {
+                        "signup_token": Collab._portal_new_signup_token(),
+                        "signup_token_expiry": Collab._portal_signup_token_expiry_string(),
+                    }
+                )
+                template = request.env.ref(
+                    "afr_wellhub.mail_template_wellhub_signup_activation",
+                    raise_if_not_found=False,
+                )
+                if template:
+                    template.sudo().send_mail(collab.id, force_send=True)
+            except Exception:
+                _logger.exception("Wellhub reenvio: falha ao renovar token ou enviar e-mail.")
+        # Sempre retorna mensagem genérica (não revela se e-mail existe)
+        return request.render(
+            "afr_wellhub.portal_wellhub_reenviar_done",
+            {},
+        )
