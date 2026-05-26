@@ -405,6 +405,10 @@ class AfrWellhubPortal(http.Controller):
                 )
                 if template:
                     template.sudo().send_mail(collab.id, force_send=True)
+                else:
+                    _logger.error(
+                        "Wellhub reenvio: template mail_template_wellhub_signup_activation não encontrado."
+                    )
             except Exception:
                 _logger.exception("Wellhub reenvio: falha ao renovar token ou enviar e-mail.")
         # Sempre retorna mensagem genérica (não revela se e-mail existe)
