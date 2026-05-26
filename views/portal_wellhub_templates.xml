@@ -467,7 +467,7 @@
                             <h2 class="wh-success-card__title">Solicitação recebida</h2>
                             <p class="wh-success-card__body">
                                 Se houver uma inscrição pendente para esse e-mail, enviaremos o link de ativação em instantes.
-                                Verifique a <strong>caixa de entrada</strong>, <strong>spam</strong> e <strong>promoções</strong>.
+                                Verifique também spam e promoções.
                             </p>
 
                             <ol class="wh-tips" aria-label="Próximos passos">
