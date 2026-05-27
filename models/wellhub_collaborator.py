@@ -599,12 +599,11 @@ class WellhubCollaborator(models.Model):
             return cached_url
 
         api = self.env["afr.wellhub.asaas.api"]
-        if not self.asaas_customer_id:
-            customer_id = api.customer_ensure(self)
-            if customer_id:
-                self.with_context(afr_wellhub_skip_asaas_sync=True).write(
-                    {"asaas_customer_id": customer_id}
-                )
+        # NÃO chamamos customer_ensure aqui: o Checkout cria seu próprio customer a partir
+        # de customerData, e fazer o POST /v3/customers antes acaba gerando duplicata no Asaas
+        # (o checkout não dedupa pelo customer existente). O `asaas_customer_id` local é
+        # populado pelo webhook CHECKOUT_PAID/PAYMENT_CREATED com o customer real que o Asaas
+        # vinculou ao checkout.
         response = api.checkout_create(self)
         checkout_id = (response.get("id") or "").strip()
         checkout_url = api.checkout_extract_url(response)
@@ -677,17 +676,47 @@ class WellhubCollaborator(models.Model):
 
     @api.model
     def _webhook_process_payment(self, payment):
-        """Localiza colaborador pelo customer Asaas e atualiza wellhub.asaas.payment."""
+        """Localiza colaborador pelo customer/subscription/checkout Asaas e atualiza wellhub.asaas.payment.
+
+        A ordem de fallback (subscription → customer → checkoutSession) protege contra
+        divergência: no fluxo via Checkout o customer criado pelo Asaas pode não bater com
+        qualquer customer pré-existente que tivéssemos localmente (Checkout não dedupa).
+        """
         if not isinstance(payment, dict):
             return
-        customer_id = payment.get("customer")
-        if not customer_id:
-            return
-        collab = self.sudo().search(
-            [("asaas_customer_id", "=", customer_id)], limit=1
-        )
+        subscription_id = (payment.get("subscription") or "").strip()
+        customer_id = (payment.get("customer") or "").strip()
+        checkout_session_id = (payment.get("checkoutSession") or "").strip()
+        Collab = self.sudo()
+        collab = Collab.browse()
+        if subscription_id:
+            collab = Collab.search(
+                [("asaas_subscription_id", "=", subscription_id)], limit=1
+            )
+        if not collab and customer_id:
+            collab = Collab.search(
+                [("asaas_customer_id", "=", customer_id)], limit=1
+            )
+        if not collab and checkout_session_id:
+            collab = Collab.search(
+                [("asaas_checkout_id", "=", checkout_session_id)], limit=1
+            )
         if not collab:
+            _logger.warning(
+                "Asaas webhook payment: colaborador não encontrado "
+                "(payment_id=%s, sub=%s, customer=%s, checkout=%s).",
+                payment.get("id"), subscription_id or "—",
+                customer_id or "—", checkout_session_id or "—",
+            )
             return
+        # Garante asaas_customer_id e asaas_subscription_id locais alinhados ao payload.
+        updates = {}
+        if customer_id and customer_id != (collab.asaas_customer_id or ""):
+            updates["asaas_customer_id"] = customer_id
+        if subscription_id and subscription_id != (collab.asaas_subscription_id or ""):
+            updates["asaas_subscription_id"] = subscription_id
+        if updates:
+            collab.with_context(afr_wellhub_skip_asaas_sync=True).write(updates)
         self.env["wellhub.asaas.payment"].sudo().upsert_from_asaas_payment_dict(
             payment, collab
         )
@@ -743,12 +772,13 @@ class WellhubCollaborator(models.Model):
             "asaas_checkout_status": new_status,
             "asaas_checkout_id": collab.asaas_checkout_id or checkout_id,
         }
-        # Asaas inclui o id do customer no payload de checkout (campo `customer`); usa-se aqui
-        # como fallback quando o asaas_customer_id local ainda não foi populado.
-        if not collab.asaas_customer_id:
-            checkout_customer_id = (checkout.get("customer") or "").strip()
-            if checkout_customer_id:
-                vals["asaas_customer_id"] = checkout_customer_id
+        # Asaas inclui o id do customer no payload de checkout (campo `customer`); ele é
+        # autoritativo — o customer que de fato foi vinculado à subscription gerada pelo
+        # Checkout. Pode divergir de qualquer asaas_customer_id local antigo (cenário em
+        # que customer_ensure prévio criou um customer diferente do que o Checkout usou).
+        checkout_customer_id = (checkout.get("customer") or "").strip()
+        if checkout_customer_id and checkout_customer_id != (collab.asaas_customer_id or ""):
+            vals["asaas_customer_id"] = checkout_customer_id
         sub_id_to_update = ""
         if event == "CHECKOUT_PAID":
             sub_id_to_update = collab.asaas_subscription_id or ""
@@ -759,11 +789,15 @@ class WellhubCollaborator(models.Model):
                     sub_id = (sub_obj.get("id") or "").strip()
                 if not sub_id:
                     api = self.env["afr.wellhub.asaas.api"]
+                    # Buscar usando o customer do payload do checkout (autoritativo), não o
+                    # asaas_customer_id local (que pode ser de um customer obsoleto criado
+                    # antes pelo fluxo legado).
+                    customer_for_lookup = checkout_customer_id or collab.asaas_customer_id
                     sub_id = (
                         api.subscription_find_by_external_reference(
                             collab._asaas_subscription_external_reference()
                         )
-                        or api.subscription_find_latest_for_customer(collab.asaas_customer_id)
+                        or api.subscription_find_latest_for_customer(customer_for_lookup)
                         or ""
                     )
                 if sub_id:

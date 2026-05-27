@@ -2,7 +2,7 @@
 {
     "name": "Wellhub / Asaas",
     "summary": "Colaboradores Wellhub e assinaturas recorrentes no Asaas",
-    "version": "18.0.1.9.3",
+    "version": "18.0.1.9.4",
     "category": "Services",
     "author": "AFR",
     "license": "LGPL-3",
