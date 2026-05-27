@@ -601,6 +601,49 @@
         </t>
     </template>
 
+    <template id="portal_wellhub_preparando_checkout" name="Wellhub: preparando link de pagamento">
+        <t t-call="website.layout">
+            <t t-set="head_extra">
+                <meta http-equiv="refresh" t-att-content="'2; url=/afr_wellhub/inscricao/ativar?token=' + (token or '')"/>
+            </t>
+            <div id="wrap" class="oe_structure wh-portal">
+                <t t-call="afr_wellhub.wh_icon_sprite"/>
+                <section class="wh-hero wh-hero--compact" aria-label="Preparando link de pagamento">
+                    <div class="wh-hero__inner">
+                        <span class="wh-hero__badge">
+                            <svg aria-hidden="true" focusable="false" width="14" height="14"><use href="#wh-i-sparkle"/></svg>
+                            Preparando seu pagamento
+                        </span>
+                        <h1 class="wh-hero__title">Estamos quase lá</h1>
+                        <p class="wh-hero__subtitle">Aguarde alguns segundos enquanto geramos seu link de pagamento seguro.</p>
+                    </div>
+                </section>
+                <section class="wh-main">
+                    <div class="wh-main__inner">
+                        <div class="wh-success-card" role="status" aria-live="polite">
+                            <div class="wh-success-card__icon" aria-hidden="true">
+                                <svg viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round">
+                                    <circle cx="28" cy="28" r="22" stroke-opacity="0.18"/>
+                                    <path d="M 50 28 a 22 22 0 0 1 -22 22">
+                                        <animateTransform attributeName="transform" type="rotate" from="0 28 28" to="360 28 28" dur="1s" repeatCount="indefinite"/>
+                                    </path>
+                                </svg>
+                            </div>
+                            <h2 class="wh-success-card__title">Gerando seu link…</h2>
+                            <p class="wh-success-card__body">
+                                Estamos confirmando seu cadastro com o processador de pagamento.
+                                Esta página atualiza sozinha quando estiver pronta — não feche o navegador.
+                            </p>
+                            <p style="margin-top: 16px; font-size: 0.85rem; color: var(--wh-ink-500);">
+                                Tempo decorrido: aproximadamente <t t-out="elapsed_seconds"/> s.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </t>
+    </template>
+
     <template id="portal_wellhub_checkout_sucesso" name="Wellhub: pagamento recebido">
         <t t-call="website.layout">
             <div id="wrap" class="oe_structure wh-portal">

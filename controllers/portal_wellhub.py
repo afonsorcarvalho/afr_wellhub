@@ -355,7 +355,7 @@ class AfrWellhubPortal(http.Controller):
                 },
             )
         try:
-            checkout_url = collab.action_portal_activate_subscription()
+            status, payload = collab.action_portal_activate_subscription()
         except UserError as e:
             return request.render(
                 "afr_wellhub.portal_wellhub_ativar_result",
@@ -375,22 +375,22 @@ class AfrWellhubPortal(http.Controller):
                     "show_asaas_email_preview": False,
                 },
             )
-        if not checkout_url:
-            _logger.warning(
-                "Wellhub ativação: ausente URL de checkout para colaborador id=%s", collab.id
-            )
+        if status == "ready":
+            return request.redirect(payload, code=303)
+        if status == "failed":
             return request.render(
                 "afr_wellhub.portal_wellhub_ativar_result",
                 {
                     "ok": False,
-                    "message": _(
-                        "Não foi possível gerar o link de pagamento. "
-                        "Solicite um novo link em /afr_wellhub/inscricao/reenviar."
-                    ),
+                    "message": payload,
                     "show_asaas_email_preview": False,
                 },
             )
-        return request.redirect(checkout_url, code=303)
+        # status == "pending": spinner + auto-refresh enquanto thread async cria o checkout.
+        return request.render(
+            "afr_wellhub.portal_wellhub_preparando_checkout",
+            {"elapsed_seconds": payload, "token": token},
+        )
 
     @http.route(
         "/afr_wellhub/checkout/sucesso",

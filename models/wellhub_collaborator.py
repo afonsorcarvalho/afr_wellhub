@@ -4,9 +4,12 @@
 import json
 import logging
 import secrets
+import threading
+import time
 from datetime import timedelta
 
-from odoo import _, api, fields, models
+import odoo
+from odoo import SUPERUSER_ID, _, api, fields, models
 from odoo.exceptions import UserError, ValidationError
 
 _logger = logging.getLogger(__name__)
@@ -1017,16 +1020,52 @@ class WellhubCollaborator(models.Model):
             },
         }
 
+    def _spawn_async_checkout(self):
+        """Cria checkout Asaas em thread background; usado para liberar o handler HTTP de imediato.
+
+        A criação do checkout chama 1-2 endpoints Asaas (customer_ensure + POST /v3/checkouts)
+        que podem levar 30-60s no sandbox e estourar o `proxy_read_timeout` do nginx (504).
+        Rodar em thread permite renderizar uma página de spinner ao usuário e fazer polling
+        via auto-refresh até `asaas_checkout_url` ficar pronto. A thread usa cursor próprio
+        (registry.cursor()) para isolar transações; commit/rollback explícitos.
+        """
+        self.ensure_one()
+        db = self.env.cr.dbname
+        cid = self.id
+
+        def runner():
+            # Pequena pausa para garantir que o write do handler HTTP já tenha sido commitado
+            # antes da thread tentar ler o registro.
+            time.sleep(0.5)
+            registry = odoo.registry(db)
+            with registry.cursor() as cr:
+                env = api.Environment(cr, SUPERUSER_ID, {})
+                try:
+                    env["wellhub.collaborator"].browse(cid)._ensure_active_checkout()
+                    cr.commit()
+                except Exception:
+                    _logger.exception(
+                        "Wellhub: criação async de checkout falhou (collaborator id=%s).", cid
+                    )
+                    cr.rollback()
+
+        threading.Thread(target=runner, daemon=True).start()
+
+    # Timeout (segundos) tolerado entre o clique no /ativar e a página de checkout ficar pronta.
+    # Acima disso, o usuário recebe orientação para tentar de novo em vez de spinner eterno.
+    _CHECKOUT_ASYNC_TIMEOUT_SECONDS = 90
+
     def action_portal_activate_subscription(self):
-        """Ativa assinatura Wellhub após confirmação do e-mail (idempotente para re-cliques pré-pagamento).
+        """Ativa assinatura Wellhub após confirmação do e-mail.
 
-        - Primeira chamada (`signup_pending=True`): grava padrões do portal e dispara a criação do
-          checkout no Asaas (via `_sync_asaas_subscription_state`).
-        - Chamadas subsequentes antes do pagamento (`wellhub_subscription_enrolled=True` sem
-          `asaas_subscription_id`): retorna URL cached ou regenera via `_ensure_active_checkout`.
-        - Já pago (`asaas_subscription_id` presente): erro de "já ativada".
+        Retorna tupla `(status, payload)`:
+          - `("ready", url)` — checkout pronto, controller faz redirect 303 para `url`.
+          - `("pending", elapsed_seconds)` — checkout em criação, controller renderiza spinner.
+          - `("failed", message)` — criação async falhou ou estourou timeout, controller exibe
+            mensagem com orientação para reenviar.
 
-        Token e `signup_pending` permanecem até o webhook `CHECKOUT_PAID` (vide `_webhook_process_checkout`).
+        Idempotência: re-cliques antes do pagamento reusam URL cached ou aguardam thread em
+        andamento. Token e `signup_pending` permanecem até o webhook `CHECKOUT_PAID`.
         """
         self.ensure_one()
         if self.asaas_subscription_id:
@@ -1035,11 +1074,7 @@ class WellhubCollaborator(models.Model):
             raise UserError(_("Esta inscrição já foi confirmada ou não é válida."))
 
         if self.wellhub_subscription_enrolled:
-            # Re-click idempotente após enrollment: regenera/reusa checkout sem reexigir validade do token.
-            # IMPORTANTE: este caminho também recupera de falha parcial — se _ensure_active_checkout
-            # falhou na primeira ativação (Asaas indisponível), o write() já gravou enrolled=True;
-            # próximo click cai aqui e tenta criar o checkout novamente.
-            return self._ensure_active_checkout()
+            return self._portal_check_or_retry_checkout()
 
         now = fields.Datetime.from_string(fields.Datetime.now())
         if self.signup_token_expiry:
@@ -1079,8 +1114,46 @@ class WellhubCollaborator(models.Model):
             "asaas_fine_type": cfg["asaas_fine_type"],
             "asaas_fine_value": cfg["asaas_fine_value"],
         }
-        self.write(vals)
-        return self.asaas_checkout_url or False
+        # afr_wellhub_skip_asaas_sync evita que o write-hook bloqueie chamando Asaas síncrono —
+        # a criação do checkout acontece via _spawn_async_checkout em thread background.
+        self.with_context(afr_wellhub_skip_asaas_sync=True).write(vals)
+        self._spawn_async_checkout()
+        return ("pending", 0)
+
+    def _portal_check_or_retry_checkout(self):
+        """Re-click após enrollment. Retorna ('ready', url) | ('pending', elapsed) | ('failed', msg)."""
+        self.ensure_one()
+        cached_url = (self.asaas_checkout_url or "").strip()
+        if (
+            cached_url.startswith(("http://", "https://"))
+            and self.asaas_checkout_status == "CREATED"
+        ):
+            now = fields.Datetime.from_string(fields.Datetime.now())
+            if (
+                self.asaas_checkout_expires_at
+                and self.asaas_checkout_expires_at > now
+            ):
+                return ("ready", cached_url)
+        started = self.signup_email_confirmed_at
+        if started:
+            elapsed = (
+                fields.Datetime.from_string(fields.Datetime.now())
+                - fields.Datetime.from_string(fields.Datetime.to_string(started))
+            ).total_seconds()
+        else:
+            elapsed = 0
+        if elapsed >= self._CHECKOUT_ASYNC_TIMEOUT_SECONDS:
+            # Timeout: relança thread async (caso o spawn anterior tenha morrido) e dá ao
+            # usuário a opção de tentar via reenviar.
+            self._spawn_async_checkout()
+            return (
+                "failed",
+                _(
+                    "A criação do link de pagamento demorou mais que o esperado. "
+                    "Aguarde alguns instantes e atualize a página ou solicite um novo link."
+                ),
+            )
+        return ("pending", int(elapsed))
 
     @api.model
     def _portal_signup_token_expiry_string(self):
