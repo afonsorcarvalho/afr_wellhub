@@ -511,6 +511,10 @@ class AfrWellhubAsaasApi(models.AbstractModel):
             "nextDueDate": next_due.strftime("%Y-%m-%d"),
             "externalReference": collaborator._asaas_subscription_external_reference(),
             "description": _("[Assinatura recorrente Wellhub] %s") % (collaborator.name or ""),
+            # notifyCustomer aqui é tentativa de já habilitar notificações Asaas na criação da
+            # subscription via checkout; se Asaas ignorar, subscription_apply_local_metadata
+            # garante o estado correto via PUT no webhook CHECKOUT_PAID.
+            "notifyCustomer": True,
         }
         payload.update(collaborator._asaas_subscription_discount_interest_fine_payload())
         return payload
