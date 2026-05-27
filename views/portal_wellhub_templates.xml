@@ -603,9 +603,6 @@
 
     <template id="portal_wellhub_preparando_checkout" name="Wellhub: preparando link de pagamento">
         <t t-call="website.layout">
-            <t t-set="head_extra">
-                <meta http-equiv="refresh" t-att-content="'2; url=/afr_wellhub/inscricao/ativar?token=' + (token or '')"/>
-            </t>
             <div id="wrap" class="oe_structure wh-portal">
                 <t t-call="afr_wellhub.wh_icon_sprite"/>
                 <section class="wh-hero wh-hero--compact" aria-label="Preparando link de pagamento">
@@ -640,6 +637,17 @@
                         </div>
                     </div>
                 </section>
+                <script t-attf-data-reload-url="/afr_wellhub/inscricao/ativar?token=#{token or ''}">
+                    (function () {
+                        var script = document.currentScript;
+                        var url = script &amp;&amp; script.getAttribute('data-reload-url');
+                        if (!url) { return; }
+                        setTimeout(function () { window.location.replace(url); }, 2000);
+                    })();
+                </script>
+                <noscript>
+                    <meta http-equiv="refresh" t-att-content="'3; url=/afr_wellhub/inscricao/ativar?token=' + (token or '')"/>
+                </noscript>
             </div>
         </t>
     </template>
