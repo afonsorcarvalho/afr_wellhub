@@ -77,7 +77,7 @@
                                     </div>
 
                                     <div class="wh-progress" aria-hidden="true">
-                                        <span class="wh-progress__label"><span class="wh-progress__count">0</span> de 4</span>
+                                        <span class="wh-progress__label"><span class="wh-progress__count">0</span> de 9</span>
                                         <div class="wh-progress__bar"/>
                                     </div>
 
@@ -156,6 +156,103 @@
                                                 </span>
                                             </div>
                                             <small id="wh_cpf_feedback" class="wh-field__feedback" aria-live="polite">Validação pelos dígitos verificadores.</small>
+                                        </div>
+
+                                        <div class="wh-field" data-wh-field="postal_code" data-wh-status="idle">
+                                            <div class="wh-field__control">
+                                                <span class="wh-field__icon" aria-hidden="true">
+                                                    <svg><use href="#wh-i-mail"/></svg>
+                                                </span>
+                                                <input type="text" class="wh-field__input" id="wh_postal_code" name="postal_code" required="required"
+                                                       placeholder=" " inputmode="numeric" maxlength="9"
+                                                       autocomplete="postal-code"
+                                                       aria-describedby="wh_postal_code_feedback"
+                                                       t-att-value="values.get('postal_code') or ''"/>
+                                                <label class="wh-field__label" for="wh_postal_code">CEP</label>
+                                                <span class="wh-field__status" aria-hidden="true">
+                                                    <span class="wh-field__status-valid"><svg><use href="#wh-i-check"/></svg></span>
+                                                    <span class="wh-field__status-invalid"><svg><use href="#wh-i-x"/></svg></span>
+                                                </span>
+                                            </div>
+                                            <small id="wh_postal_code_feedback" class="wh-field__feedback" aria-live="polite">8 dígitos (ex.: 65000-000).</small>
+                                        </div>
+
+                                        <div class="wh-field" data-wh-field="street" data-wh-status="idle">
+                                            <div class="wh-field__control">
+                                                <span class="wh-field__icon" aria-hidden="true">
+                                                    <svg><use href="#wh-i-mail"/></svg>
+                                                </span>
+                                                <input type="text" class="wh-field__input" id="wh_street" name="street" required="required"
+                                                       placeholder=" "
+                                                       autocomplete="street-address"
+                                                       aria-describedby="wh_street_feedback"
+                                                       t-att-value="values.get('street') or ''"/>
+                                                <label class="wh-field__label" for="wh_street">Logradouro</label>
+                                                <span class="wh-field__status" aria-hidden="true">
+                                                    <span class="wh-field__status-valid"><svg><use href="#wh-i-check"/></svg></span>
+                                                    <span class="wh-field__status-invalid"><svg><use href="#wh-i-x"/></svg></span>
+                                                </span>
+                                            </div>
+                                            <small id="wh_street_feedback" class="wh-field__feedback" aria-live="polite">Rua, avenida, travessa, etc.</small>
+                                        </div>
+
+                                        <div class="wh-field" data-wh-field="street_number" data-wh-status="idle">
+                                            <div class="wh-field__control">
+                                                <span class="wh-field__icon" aria-hidden="true">
+                                                    <svg><use href="#wh-i-mail"/></svg>
+                                                </span>
+                                                <input type="text" class="wh-field__input" id="wh_street_number" name="street_number" required="required"
+                                                       placeholder=" "
+                                                       aria-describedby="wh_street_number_feedback"
+                                                       t-att-value="values.get('street_number') or ''"/>
+                                                <label class="wh-field__label" for="wh_street_number">Número</label>
+                                                <span class="wh-field__status" aria-hidden="true">
+                                                    <span class="wh-field__status-valid"><svg><use href="#wh-i-check"/></svg></span>
+                                                    <span class="wh-field__status-invalid"><svg><use href="#wh-i-x"/></svg></span>
+                                                </span>
+                                            </div>
+                                            <small id="wh_street_number_feedback" class="wh-field__feedback" aria-live="polite">Use S/N se não houver.</small>
+                                        </div>
+
+                                        <div class="wh-field" data-wh-field="city" data-wh-status="idle">
+                                            <div class="wh-field__control">
+                                                <span class="wh-field__icon" aria-hidden="true">
+                                                    <svg><use href="#wh-i-mail"/></svg>
+                                                </span>
+                                                <input type="text" class="wh-field__input" id="wh_city" name="city" required="required"
+                                                       placeholder=" "
+                                                       autocomplete="address-level2"
+                                                       aria-describedby="wh_city_feedback"
+                                                       t-att-value="values.get('city') or ''"/>
+                                                <label class="wh-field__label" for="wh_city">Cidade</label>
+                                                <span class="wh-field__status" aria-hidden="true">
+                                                    <span class="wh-field__status-valid"><svg><use href="#wh-i-check"/></svg></span>
+                                                    <span class="wh-field__status-invalid"><svg><use href="#wh-i-x"/></svg></span>
+                                                </span>
+                                            </div>
+                                            <small id="wh_city_feedback" class="wh-field__feedback" aria-live="polite"></small>
+                                        </div>
+
+                                        <div class="wh-field" data-wh-field="state_uf" data-wh-status="idle">
+                                            <div class="wh-field__control">
+                                                <span class="wh-field__icon" aria-hidden="true">
+                                                    <svg><use href="#wh-i-mail"/></svg>
+                                                </span>
+                                                <select class="wh-field__input" id="wh_state_uf" name="state_uf" required="required"
+                                                        autocomplete="address-level1"
+                                                        aria-describedby="wh_state_uf_feedback">
+                                                    <option value="">UF</option>
+                                                    <t t-foreach="[('AC','Acre'),('AL','Alagoas'),('AP','Amapá'),('AM','Amazonas'),('BA','Bahia'),('CE','Ceará'),('DF','Distrito Federal'),('ES','Espírito Santo'),('GO','Goiás'),('MA','Maranhão'),('MT','Mato Grosso'),('MS','Mato Grosso do Sul'),('MG','Minas Gerais'),('PA','Pará'),('PB','Paraíba'),('PR','Paraná'),('PE','Pernambuco'),('PI','Piauí'),('RJ','Rio de Janeiro'),('RN','Rio Grande do Norte'),('RS','Rio Grande do Sul'),('RO','Rondônia'),('RR','Roraima'),('SC','Santa Catarina'),('SP','São Paulo'),('SE','Sergipe'),('TO','Tocantins')]" t-as="uf">
+                                                        <option t-att-value="uf[0]" t-att-selected="values.get('state_uf') == uf[0]"><t t-out="uf[0]"/> — <t t-out="uf[1]"/></option>
+                                                    </t>
+                                                </select>
+                                                <label class="wh-field__label" for="wh_state_uf">UF</label>
+                                                <span class="wh-field__status" aria-hidden="true">
+                                                    <span class="wh-field__status-valid"><svg><use href="#wh-i-check"/></svg></span>
+                                                    <span class="wh-field__status-invalid"><svg><use href="#wh-i-x"/></svg></span>
+                                                </span>
+                                            </div>
+                                            <small id="wh_state_uf_feedback" class="wh-field__feedback" aria-live="polite">Selecione o estado.</small>
                                         </div>
 
                                         <button type="submit" class="wh-btn-primary" data-state="idle" disabled="disabled">

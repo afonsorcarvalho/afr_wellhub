@@ -455,11 +455,32 @@ class AfrWellhubAsaasApi(models.AbstractModel):
     def _checkout_customer_data_payload(self, collaborator):
         cpf_cnpj = re.sub(r"\D", "", collaborator.cpf_cnpj or "")
         phone_digits = re.sub(r"\D", "", collaborator.phone or "")
+        cep_digits = re.sub(r"\D", "", collaborator.postal_code or "")
+        missing = []
+        if not (collaborator.street or "").strip():
+            missing.append(_("logradouro"))
+        if not (collaborator.street_number or "").strip():
+            missing.append(_("número"))
+        if not cep_digits:
+            missing.append(_("CEP"))
+        if not collaborator.state_uf:
+            missing.append(_("UF"))
+        if missing:
+            raise UserError(
+                _("Preencha o endereço do colaborador antes de gerar o checkout (faltando: %s).")
+                % ", ".join(missing)
+            )
         data = {
             "name": collaborator.name or "",
             "email": collaborator.email or "",
             "cpfCnpj": cpf_cnpj,
+            "address": (collaborator.street or "").strip(),
+            "addressNumber": (collaborator.street_number or "").strip(),
+            "postalCode": cep_digits,
+            "province": collaborator.state_uf,
         }
+        if collaborator.city:
+            data["city"] = collaborator.city.strip()
         if phone_digits:
             data["phone"] = phone_digits
         return data

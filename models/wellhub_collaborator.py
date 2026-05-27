@@ -27,6 +27,28 @@ class WellhubCollaborator(models.Model):
         required=True,
         help="Obrigatório para cadastro do cliente no Asaas (API exige cpfCnpj).",
     )
+    # Endereço — exigido pelo Asaas Checkout (POST /v3/checkouts) em customerData.address,
+    # addressNumber, postalCode e province. Mantido opcional no modelo para compatibilidade
+    # com colaboradores antigos cadastrados via backend; validado como obrigatório só no
+    # fluxo do portal (controllers/portal_wellhub.py).
+    street = fields.Char(string="Logradouro")
+    street_number = fields.Char(string="Número")
+    postal_code = fields.Char(string="CEP")
+    city = fields.Char(string="Cidade")
+    state_uf = fields.Selection(
+        selection=[
+            ("AC", "Acre"), ("AL", "Alagoas"), ("AP", "Amapá"), ("AM", "Amazonas"),
+            ("BA", "Bahia"), ("CE", "Ceará"), ("DF", "Distrito Federal"),
+            ("ES", "Espírito Santo"), ("GO", "Goiás"), ("MA", "Maranhão"),
+            ("MT", "Mato Grosso"), ("MS", "Mato Grosso do Sul"), ("MG", "Minas Gerais"),
+            ("PA", "Pará"), ("PB", "Paraíba"), ("PR", "Paraná"), ("PE", "Pernambuco"),
+            ("PI", "Piauí"), ("RJ", "Rio de Janeiro"), ("RN", "Rio Grande do Norte"),
+            ("RS", "Rio Grande do Sul"), ("RO", "Rondônia"), ("RR", "Roraima"),
+            ("SC", "Santa Catarina"), ("SP", "São Paulo"), ("SE", "Sergipe"),
+            ("TO", "Tocantins"),
+        ],
+        string="UF",
+    )
     company_id = fields.Many2one(
         "res.company",
         string="Empresa",

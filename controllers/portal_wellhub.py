@@ -121,12 +121,23 @@ class AfrWellhubPortal(http.Controller):
             "preview_link_example": preview_link_example,
         }
 
+    _VALID_BR_UFS = frozenset({
+        "AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA",
+        "MT", "MS", "MG", "PA", "PB", "PR", "PE", "PI", "RJ", "RN",
+        "RS", "RO", "RR", "SC", "SP", "SE", "TO",
+    })
+
     def _validate_signup_payload(self, post):
-        """Valida nome, e-mail (normalizado), telefone BR e CPF com dígitos verificadores."""
+        """Valida nome, e-mail (normalizado), telefone BR, CPF e endereço (exigido pelo Asaas Checkout)."""
         name = (post.get("name") or "").strip()
         email = (post.get("email") or "").strip()
         phone = (post.get("phone") or "").strip()
         cpf_cnpj = (post.get("cpf_cnpj") or "").strip()
+        street = (post.get("street") or "").strip()
+        street_number = (post.get("street_number") or "").strip()
+        postal_code = (post.get("postal_code") or "").strip()
+        city = (post.get("city") or "").strip()
+        state_uf = (post.get("state_uf") or "").strip().upper()
         if len(name) < 2:
             raise ValidationError(_("Informe o nome completo."))
         email_norm = email_normalize(email, strict=False)
@@ -148,11 +159,28 @@ class AfrWellhubPortal(http.Controller):
         if not _cpf_digits_valid(cpf_digits):
             raise ValidationError(_("CPF inválido (dígitos verificadores)."))
 
+        if not street:
+            raise ValidationError(_("Informe o logradouro (rua/avenida)."))
+        if not street_number:
+            raise ValidationError(_("Informe o número do endereço."))
+        cep_digits = re.sub(r"\D", "", postal_code)
+        if len(cep_digits) != 8:
+            raise ValidationError(_("O CEP deve ter 8 dígitos."))
+        if not city:
+            raise ValidationError(_("Informe a cidade."))
+        if state_uf not in self._VALID_BR_UFS:
+            raise ValidationError(_("Selecione uma UF válida."))
+
         return {
             "name": name,
             "email": email_norm,
             "phone": _format_br_phone_display(phone_digits),
             "cpf_cnpj": cpf_digits,
+            "street": street,
+            "street_number": street_number,
+            "postal_code": cep_digits,
+            "city": city,
+            "state_uf": state_uf,
         }
 
     @http.route(
@@ -183,6 +211,11 @@ class AfrWellhubPortal(http.Controller):
             "email": post.get("email") or "",
             "phone": post.get("phone") or "",
             "cpf_cnpj": post.get("cpf_cnpj") or "",
+            "street": post.get("street") or "",
+            "street_number": post.get("street_number") or "",
+            "postal_code": post.get("postal_code") or "",
+            "city": post.get("city") or "",
+            "state_uf": (post.get("state_uf") or "").upper(),
         }
         try:
             payload = self._validate_signup_payload(post)
@@ -212,6 +245,11 @@ class AfrWellhubPortal(http.Controller):
                             "name": payload["name"],
                             "phone": payload["phone"],
                             "cpf_cnpj": payload["cpf_cnpj"],
+                            "street": payload["street"],
+                            "street_number": payload["street_number"],
+                            "postal_code": payload["postal_code"],
+                            "city": payload["city"],
+                            "state_uf": payload["state_uf"],
                             "portal_inscription": True,
                             **portal_vals,
                         }
@@ -233,6 +271,11 @@ class AfrWellhubPortal(http.Controller):
                         "email": payload["email"],
                         "phone": payload["phone"],
                         "cpf_cnpj": payload["cpf_cnpj"],
+                        "street": payload["street"],
+                        "street_number": payload["street_number"],
+                        "postal_code": payload["postal_code"],
+                        "city": payload["city"],
+                        "state_uf": payload["state_uf"],
                         "company_id": company.id,
                         "wellhub_subscription_enrolled": False,
                         "signup_pending": True,
