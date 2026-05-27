@@ -578,6 +578,11 @@ class WellhubCollaborator(models.Model):
     def _ensure_active_checkout(self):
         """Retorna URL do checkout vigente; reusa se ainda válido (CREATED + não expirado), senão cria novo.
 
+        Garante `asaas_customer_id` populado localmente antes da criação do checkout — sem isso,
+        as ações de backend ("Sincronizar cobranças Asaas") e o handler do webhook não conseguem
+        relacionar pagamentos do Asaas ao colaborador (faltam tanto customer quanto subscription
+        no model local).
+
         Documentação: https://docs.asaas.com/docs/checkout-com-assinatura-recorrente
         """
         self.ensure_one()
@@ -594,6 +599,12 @@ class WellhubCollaborator(models.Model):
             return cached_url
 
         api = self.env["afr.wellhub.asaas.api"]
+        if not self.asaas_customer_id:
+            customer_id = api.customer_ensure(self)
+            if customer_id:
+                self.with_context(afr_wellhub_skip_asaas_sync=True).write(
+                    {"asaas_customer_id": customer_id}
+                )
         response = api.checkout_create(self)
         checkout_id = (response.get("id") or "").strip()
         checkout_url = api.checkout_extract_url(response)
@@ -732,6 +743,12 @@ class WellhubCollaborator(models.Model):
             "asaas_checkout_status": new_status,
             "asaas_checkout_id": collab.asaas_checkout_id or checkout_id,
         }
+        # Asaas inclui o id do customer no payload de checkout (campo `customer`); usa-se aqui
+        # como fallback quando o asaas_customer_id local ainda não foi populado.
+        if not collab.asaas_customer_id:
+            checkout_customer_id = (checkout.get("customer") or "").strip()
+            if checkout_customer_id:
+                vals["asaas_customer_id"] = checkout_customer_id
         sub_id_to_update = ""
         if event == "CHECKOUT_PAID":
             sub_id_to_update = collab.asaas_subscription_id or ""
