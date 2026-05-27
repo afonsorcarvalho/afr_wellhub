@@ -376,7 +376,10 @@ class AfrWellhubPortal(http.Controller):
                 },
             )
         if status == "ready":
-            return request.redirect(payload, code=303)
+            # local=False é obrigatório: o destino é externo (Asaas) e o default `local=True`
+            # de `request.redirect` em Odoo 18 strippa scheme+netloc, transformando a URL em
+            # path relativo (o browser segue contra o host do nosso portal → 404).
+            return request.redirect(payload, code=303, local=False)
         if status == "failed":
             return request.render(
                 "afr_wellhub.portal_wellhub_ativar_result",
