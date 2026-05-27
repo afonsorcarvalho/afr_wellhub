@@ -40,6 +40,123 @@
             d.slice(7, 11);
     }
 
+    function applyCEPMask(el) {
+        var d = digitsOnly(el.value).slice(0, 8);
+        if (d.length <= 5) {
+            el.value = d;
+            return;
+        }
+        el.value = d.slice(0, 5) + "-" + d.slice(5);
+    }
+
+    // ViaCEP: https://viacep.com.br/ws/{cep}/json/
+    // Resposta: { cep, logradouro, complemento, bairro, localidade, uf, ... }
+    // Erro: { erro: true } (CEP inexistente) ou HTTP 400 (formato inválido).
+    function lookupCEP(cep, callbacks) {
+        var digits = digitsOnly(cep);
+        if (digits.length !== 8) {
+            return;
+        }
+        var url = "https://viacep.com.br/ws/" + digits + "/json/";
+        if (typeof fetch !== "function") {
+            return;
+        }
+        callbacks = callbacks || {};
+        if (callbacks.onStart) callbacks.onStart();
+        fetch(url, { method: "GET", mode: "cors" })
+            .then(function (resp) {
+                if (!resp.ok) {
+                    throw new Error("HTTP " + resp.status);
+                }
+                return resp.json();
+            })
+            .then(function (data) {
+                if (data && data.erro) {
+                    if (callbacks.onNotFound) callbacks.onNotFound();
+                    return;
+                }
+                if (callbacks.onFound) callbacks.onFound(data);
+            })
+            .catch(function () {
+                if (callbacks.onError) callbacks.onError();
+            });
+    }
+
+    function bindCEPLookup() {
+        var cepInput = document.getElementById("wh_postal_code");
+        if (!cepInput) {
+            return;
+        }
+        var streetInput = document.getElementById("wh_street");
+        var cityInput = document.getElementById("wh_city");
+        var ufInput = document.getElementById("wh_state_uf");
+        var numberInput = document.getElementById("wh_street_number");
+        var cepField = cepInput.closest(".wh-field");
+        var feedback = cepField ? cepField.querySelector(".wh-field__feedback") : null;
+        var defaultMsg = feedback ? feedback.textContent : "";
+
+        cepInput.setAttribute("maxlength", "9");
+        cepInput.setAttribute("inputmode", "numeric");
+
+        function setMsg(state, msg) {
+            if (cepField) cepField.setAttribute("data-wh-status", state);
+            if (feedback) feedback.textContent = msg;
+        }
+
+        function fillIfEmpty(input, val) {
+            if (!input || !val) return;
+            if (!input.value || !input.value.trim()) {
+                input.value = val;
+            }
+        }
+
+        function fillAlways(input, val) {
+            if (!input || !val) return;
+            input.value = val;
+        }
+
+        function triggerLookup() {
+            var d = digitsOnly(cepInput.value);
+            if (d.length !== 8) {
+                if (d.length === 0) setMsg("idle", defaultMsg);
+                return;
+            }
+            lookupCEP(d, {
+                onStart: function () {
+                    setMsg("idle", "Buscando endereço…");
+                },
+                onFound: function (data) {
+                    fillAlways(streetInput, data.logradouro || "");
+                    fillAlways(cityInput, data.localidade || "");
+                    if (ufInput && data.uf) {
+                        ufInput.value = data.uf;
+                    }
+                    setMsg("valid", "Endereço preenchido. Confirme número e complemento.");
+                    if (numberInput && (!numberInput.value || !numberInput.value.trim())) {
+                        numberInput.focus();
+                    }
+                },
+                onNotFound: function () {
+                    setMsg("invalid", "CEP não encontrado. Preencha o endereço manualmente.");
+                },
+                onError: function () {
+                    setMsg("idle", "Não foi possível consultar o CEP. Preencha manualmente.");
+                }
+            });
+        }
+
+        cepInput.addEventListener("input", function () {
+            applyCEPMask(cepInput);
+            if (digitsOnly(cepInput.value).length === 8) {
+                triggerLookup();
+            }
+        });
+        cepInput.addEventListener("blur", function () {
+            applyCEPMask(cepInput);
+            triggerLookup();
+        });
+    }
+
     function applyCPFMask(el) {
         var d = digitsOnly(el.value).slice(0, 11);
         if (d.length === 0) {
@@ -93,6 +210,7 @@
                 applyCPFMask(cpf);
             });
         }
+        bindCEPLookup();
         bindPromoVideoSoundUnlock();
         wireReactiveValidation();
     }
