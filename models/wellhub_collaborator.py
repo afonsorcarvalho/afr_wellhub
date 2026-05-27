@@ -732,8 +732,10 @@ class WellhubCollaborator(models.Model):
             "asaas_checkout_status": new_status,
             "asaas_checkout_id": collab.asaas_checkout_id or checkout_id,
         }
+        sub_id_to_update = ""
         if event == "CHECKOUT_PAID":
-            if not collab.asaas_subscription_id:
+            sub_id_to_update = collab.asaas_subscription_id or ""
+            if not sub_id_to_update:
                 sub_obj = checkout.get("subscription")
                 sub_id = ""
                 if isinstance(sub_obj, dict):
@@ -749,6 +751,7 @@ class WellhubCollaborator(models.Model):
                     )
                 if sub_id:
                     vals["asaas_subscription_id"] = sub_id
+                    sub_id_to_update = sub_id
             vals.update(
                 {
                     "signup_token": False,
@@ -756,6 +759,21 @@ class WellhubCollaborator(models.Model):
                 }
             )
         collab.with_context(afr_wellhub_skip_asaas_sync=True).write(vals)
+        # PUT /v3/subscriptions/{id} para aplicar description + discount/interest/fine que
+        # o Checkout não propaga ao criar a subscription automática. Idempotente; falhas são
+        # logadas mas não bloqueiam o webhook (assinatura já existe no Asaas).
+        if event == "CHECKOUT_PAID" and sub_id_to_update:
+            try:
+                self.env["afr.wellhub.asaas.api"].subscription_apply_local_metadata(
+                    collab, sub_id_to_update
+                )
+            except Exception:
+                _logger.exception(
+                    "Wellhub webhook: falha ao atualizar metadados da subscription %s "
+                    "(collaborator id=%s).",
+                    sub_id_to_update,
+                    collab.id,
+                )
 
     def action_sync_wellhub_api(self):
         """Placeholder para integração futura com API Wellhub (sem documentação no escopo atual)."""

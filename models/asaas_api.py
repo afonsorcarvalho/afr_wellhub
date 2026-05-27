@@ -503,13 +503,42 @@ class AfrWellhubAsaasApi(models.AbstractModel):
             "afr_wellhub.default_cycle", "MONTHLY"
         )
         next_due = collaborator.next_due_date or fields.Date.context_today(collaborator)
-        # externalReference no bloco subscription: doc oficial não documenta, mas se Asaas aceitar
-        # facilita a localização via subscription_find_by_external_reference no webhook CHECKOUT_PAID.
-        return {
+        # externalReference + description no bloco subscription: doc oficial não documenta esses
+        # campos no Checkout, mas se Asaas aceitar evita o PUT pós-CHECKOUT_PAID. Caso o Asaas
+        # ignore, o handler do webhook chama subscription_update para garantir o estado correto.
+        payload = {
             "cycle": cycle,
             "nextDueDate": next_due.strftime("%Y-%m-%d"),
             "externalReference": collaborator._asaas_subscription_external_reference(),
+            "description": _("[Assinatura recorrente Wellhub] %s") % (collaborator.name or ""),
         }
+        payload.update(collaborator._asaas_subscription_discount_interest_fine_payload())
+        return payload
+
+    @api.model
+    def subscription_update(self, subscription_id, payload):
+        """PUT /v3/subscriptions/{id} — usado após CHECKOUT_PAID para aplicar description,
+        discount, interest e fine que o Checkout não propagou.
+        """
+        if not subscription_id:
+            return {}
+        return self._request(
+            "PUT",
+            f"/v3/subscriptions/{subscription_id}",
+            json_body=payload,
+        )
+
+    @api.model
+    def subscription_apply_local_metadata(self, collaborator, subscription_id):
+        """Garante description + desconto/juros/multa na subscription criada via Checkout."""
+        if not subscription_id:
+            return {}
+        payload = {
+            "description": _("[Assinatura recorrente Wellhub] %s") % (collaborator.name or ""),
+            "notifyCustomer": True,
+        }
+        payload.update(collaborator._asaas_subscription_discount_interest_fine_payload())
+        return self.subscription_update(subscription_id, payload)
 
     @api.model
     def checkout_create(self, collaborator):
