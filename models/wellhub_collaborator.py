@@ -1027,27 +1027,50 @@ class WellhubCollaborator(models.Model):
         que podem levar 30-60s no sandbox e estourar o `proxy_read_timeout` do nginx (504).
         Rodar em thread permite renderizar uma página de spinner ao usuário e fazer polling
         via auto-refresh até `asaas_checkout_url` ficar pronto. A thread usa cursor próprio
-        (registry.cursor()) para isolar transações; commit/rollback explícitos.
+        (Registry(db).cursor()) para isolar transações; commit/rollback explícitos.
+
+        A thread espera ~1.5s antes de ler para reduzir colisão "could not serialize access due
+        to concurrent update" com o COMMIT do handler HTTP, e ainda assim tenta novamente
+        em caso de erro de serialização (Postgres SQLSTATE 40001).
         """
         self.ensure_one()
         db = self.env.cr.dbname
         cid = self.id
 
         def runner():
-            # Pequena pausa para garantir que o write do handler HTTP já tenha sido commitado
-            # antes da thread tentar ler o registro.
-            time.sleep(0.5)
-            registry = odoo.registry(db)
-            with registry.cursor() as cr:
-                env = api.Environment(cr, SUPERUSER_ID, {})
-                try:
-                    env["wellhub.collaborator"].browse(cid)._ensure_active_checkout()
-                    cr.commit()
-                except Exception:
-                    _logger.exception(
-                        "Wellhub: criação async de checkout falhou (collaborator id=%s).", cid
-                    )
-                    cr.rollback()
+            time.sleep(1.5)
+            registry = odoo.modules.registry.Registry(db)
+            max_attempts = 3
+            backoff = 1.0
+            for attempt in range(1, max_attempts + 1):
+                with registry.cursor() as cr:
+                    env = api.Environment(cr, SUPERUSER_ID, {})
+                    try:
+                        env["wellhub.collaborator"].browse(cid)._ensure_active_checkout()
+                        cr.commit()
+                        return
+                    except Exception as e:
+                        cr.rollback()
+                        msg = str(e)
+                        is_serialize_conflict = (
+                            "could not serialize access" in msg
+                            or "concurrent update" in msg
+                            or getattr(e, "pgcode", "") == "40001"
+                        )
+                        if is_serialize_conflict and attempt < max_attempts:
+                            _logger.info(
+                                "Wellhub: conflito de serialização ao criar checkout "
+                                "(collaborator id=%s, tentativa %s/%s). Aguardando %.1fs.",
+                                cid, attempt, max_attempts, backoff,
+                            )
+                            time.sleep(backoff)
+                            backoff *= 2
+                            continue
+                        _logger.exception(
+                            "Wellhub: criação async de checkout falhou (collaborator id=%s).",
+                            cid,
+                        )
+                        return
 
         threading.Thread(target=runner, daemon=True).start()
 
@@ -1117,6 +1140,11 @@ class WellhubCollaborator(models.Model):
         # afr_wellhub_skip_asaas_sync evita que o write-hook bloqueie chamando Asaas síncrono —
         # a criação do checkout acontece via _spawn_async_checkout em thread background.
         self.with_context(afr_wellhub_skip_asaas_sync=True).write(vals)
+        # Commit antes do spawn: a thread async usa cursor próprio (outra conexão Postgres) e
+        # leria snapshot anterior ao write deste handler, causando "could not serialize access
+        # due to concurrent update" quando tentasse atualizar asaas_checkout_*. Commit aqui
+        # garante visibilidade entre cursors antes do trabalho assíncrono começar.
+        self.env.cr.commit()
         self._spawn_async_checkout()
         return ("pending", 0)
 
