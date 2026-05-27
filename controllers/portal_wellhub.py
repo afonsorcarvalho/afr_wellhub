@@ -390,10 +390,18 @@ class AfrWellhubPortal(http.Controller):
                 },
             )
         # status == "pending": spinner + auto-refresh enquanto thread async cria o checkout.
-        return request.render(
+        # Headers no-store impedem que o browser sirva a versão pendente de cache na próxima
+        # iteração (cenário observado em prod: spinner ficava em loop infinito porque o JS
+        # reload via window.location.replace reaproveitava a resposta cached em vez de fazer
+        # novo fetch ao backend, que já estava devolvendo 303 para o Asaas).
+        response = request.render(
             "afr_wellhub.portal_wellhub_preparando_checkout",
             {"elapsed_seconds": payload, "token": token},
         )
+        response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+        response.headers["Pragma"] = "no-cache"
+        response.headers["Expires"] = "0"
+        return response
 
     @http.route(
         "/afr_wellhub/checkout/sucesso",

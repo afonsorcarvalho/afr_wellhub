@@ -637,12 +637,18 @@
                         </div>
                     </div>
                 </section>
-                <script t-attf-data-reload-url="/afr_wellhub/inscricao/ativar?token=#{token or ''}">
+                <script t-attf-data-reload-base="/afr_wellhub/inscricao/ativar?token=#{token or ''}">
                     (function () {
                         var script = document.currentScript;
-                        var url = script &amp;&amp; script.getAttribute('data-reload-url');
-                        if (!url) { return; }
-                        setTimeout(function () { window.location.replace(url); }, 2000);
+                        var base = script &amp;&amp; script.getAttribute('data-reload-base');
+                        if (!base) { return; }
+                        setTimeout(function () {
+                            // Cache-buster: cada reload usa querystring única para impedir o browser
+                            // de reaproveitar a resposta anterior do spinner (que retornaria 200
+                            // em vez do 303 atual do backend).
+                            var sep = base.indexOf('?') === -1 ? '?' : '&amp;';
+                            window.location.replace(base + sep + '_=' + Date.now());
+                        }, 2000);
                     })();
                 </script>
                 <noscript>
