@@ -255,6 +255,19 @@ class AfrWellhubAsaasApi(models.AbstractModel):
         }
         if phone_digits:
             payload["mobilePhone"] = phone_digits
+        # Endereço enviado ao criar/atualizar o customer para que o Checkout aceite reutilizá-lo
+        # via campo `customer` (sem precisar de customerData adicional).
+        cep_digits = re.sub(r"\D", "", collaborator.postal_code or "")
+        if collaborator.street:
+            payload["address"] = collaborator.street.strip()
+        if collaborator.street_number:
+            payload["addressNumber"] = collaborator.street_number.strip()
+        if cep_digits:
+            payload["postalCode"] = cep_digits
+        if collaborator.state_uf:
+            payload["province"] = collaborator.state_uf
+        if collaborator.city:
+            payload["city"] = collaborator.city.strip()
         payload.update(group_extra)
 
         existing_by_doc = self.customer_find_by_cpf_cnpj(cpf_cnpj)
@@ -545,8 +558,13 @@ class AfrWellhubAsaasApi(models.AbstractModel):
         return self.subscription_update(subscription_id, payload)
 
     @api.model
-    def checkout_create(self, collaborator):
+    def checkout_create(self, collaborator, customer_id=None):
         """POST /v3/checkouts — cria checkout Asaas com assinatura recorrente (CREDIT_CARD).
+
+        Se `customer_id` for fornecido (Asaas customer já existente, dedupado via
+        `customer_ensure`), envia o campo `customer` e omite `customerData` — evita que o
+        Checkout crie um customer novo a cada chamada. Caso contrário, cai no fluxo com
+        `customerData` (Asaas cria customer baseado nos dados).
 
         Documentação: https://docs.asaas.com/reference/criar-novo-checkout
         Guia: https://docs.asaas.com/docs/checkout-com-assinatura-recorrente
@@ -575,10 +593,13 @@ class AfrWellhubAsaasApi(models.AbstractModel):
                     "value": value,
                 }
             ],
-            "customerData": self._checkout_customer_data_payload(collaborator),
             "subscription": self._checkout_subscription_payload(collaborator),
             "externalReference": self._checkout_external_reference(collaborator),
         }
+        if customer_id:
+            payload["customer"] = customer_id
+        else:
+            payload["customerData"] = self._checkout_customer_data_payload(collaborator)
         return self._request("POST", "/v3/checkouts", json_body=payload)
 
     @api.model

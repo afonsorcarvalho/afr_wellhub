@@ -599,12 +599,17 @@ class WellhubCollaborator(models.Model):
             return cached_url
 
         api = self.env["afr.wellhub.asaas.api"]
-        # NÃO chamamos customer_ensure aqui: o Checkout cria seu próprio customer a partir
-        # de customerData, e fazer o POST /v3/customers antes acaba gerando duplicata no Asaas
-        # (o checkout não dedupa pelo customer existente). O `asaas_customer_id` local é
-        # populado pelo webhook CHECKOUT_PAID/PAYMENT_CREATED com o customer real que o Asaas
-        # vinculou ao checkout.
-        response = api.checkout_create(self)
+        # Garante customer Asaas dedupado (POST /v3/customers ou GET por externalReference/CPF)
+        # antes do checkout, e o passa via campo `customer` no payload — sem isso o Checkout
+        # cria customer novo a cada chamada via customerData (Asaas painel acumula dezenas de
+        # registros idênticos do mesmo CPF/email).
+        if not self.asaas_customer_id:
+            customer_id = api.customer_ensure(self)
+            if customer_id:
+                self.with_context(afr_wellhub_skip_asaas_sync=True).write(
+                    {"asaas_customer_id": customer_id}
+                )
+        response = api.checkout_create(self, customer_id=self.asaas_customer_id or None)
         checkout_id = (response.get("id") or "").strip()
         checkout_url = api.checkout_extract_url(response)
         if not checkout_id or not checkout_url:
