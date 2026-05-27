@@ -503,4 +503,111 @@
             </div>
         </t>
     </template>
+
+    <template id="portal_wellhub_checkout_sucesso" name="Wellhub: pagamento recebido">
+        <t t-call="website.layout">
+            <div id="wrap" class="oe_structure wh-portal">
+                <t t-call="afr_wellhub.wh_icon_sprite"/>
+                <section class="wh-hero wh-hero--compact" aria-label="Pagamento recebido">
+                    <div class="wh-hero__inner">
+                        <span class="wh-hero__badge">
+                            <svg aria-hidden="true" focusable="false" width="14" height="14"><use href="#wh-i-sparkle"/></svg>
+                            Pagamento recebido
+                        </span>
+                        <h1 class="wh-hero__title">Tudo certo</h1>
+                        <p class="wh-hero__subtitle">Sua assinatura Wellhub será ativada em instantes.</p>
+                    </div>
+                </section>
+                <section class="wh-main">
+                    <div class="wh-main__inner">
+                        <div class="wh-success-card">
+                            <div class="wh-success-card__icon" aria-hidden="true">
+                                <svg viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle class="wh-success-draw-ring" cx="28" cy="28" r="26"/>
+                                    <path class="wh-success-draw-check" d="m16 28 8 8 16-18"/>
+                                </svg>
+                            </div>
+                            <h2 class="wh-success-card__title">Pagamento confirmado</h2>
+                            <p class="wh-success-card__body">
+                                Recebemos a confirmação do seu pagamento. A assinatura será ativada
+                                após o processamento final pelo Asaas.
+                                Você receberá um e-mail com os detalhes.
+                            </p>
+                            <a class="wh-btn-secondary" href="/">
+                                <svg width="16" height="16" aria-hidden="true" style="transform: rotate(180deg);"><use href="#wh-i-arrow-right"/></svg>
+                                Voltar ao site
+                            </a>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </t>
+    </template>
+
+    <template id="portal_wellhub_checkout_cancelado" name="Wellhub: pagamento cancelado">
+        <t t-call="website.layout">
+            <div id="wrap" class="oe_structure wh-portal">
+                <t t-call="afr_wellhub.wh_icon_sprite"/>
+                <section class="wh-hero wh-hero--compact" aria-label="Pagamento cancelado">
+                    <div class="wh-hero__inner">
+                        <span class="wh-hero__badge">
+                            <svg aria-hidden="true" focusable="false" width="14" height="14"><use href="#wh-i-mail"/></svg>
+                            Pagamento cancelado
+                        </span>
+                        <h1 class="wh-hero__title">Pagamento não concluído</h1>
+                        <p class="wh-hero__subtitle">Você cancelou ou fechou a página de pagamento.</p>
+                    </div>
+                </section>
+                <section class="wh-main">
+                    <div class="wh-main__inner">
+                        <div class="wh-success-card">
+                            <h2 class="wh-success-card__title">Quer tentar novamente?</h2>
+                            <p class="wh-success-card__body">
+                                Seu link de ativação ainda pode estar válido. Volte ao e-mail
+                                que recebemos e clique no link novamente para abrir a página
+                                de pagamento. Se o link já expirou, solicite um novo.
+                            </p>
+                            <a class="wh-btn-secondary" href="/afr_wellhub/inscricao/reenviar">
+                                <svg width="16" height="16" aria-hidden="true"><use href="#wh-i-mail"/></svg>
+                                Solicitar novo link
+                            </a>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </t>
+    </template>
+
+    <template id="portal_wellhub_checkout_expirado" name="Wellhub: link de pagamento expirado">
+        <t t-call="website.layout">
+            <div id="wrap" class="oe_structure wh-portal">
+                <t t-call="afr_wellhub.wh_icon_sprite"/>
+                <section class="wh-hero wh-hero--compact" aria-label="Link expirado">
+                    <div class="wh-hero__inner">
+                        <span class="wh-hero__badge">
+                            <svg aria-hidden="true" focusable="false" width="14" height="14"><use href="#wh-i-mail"/></svg>
+                            Link expirado
+                        </span>
+                        <h1 class="wh-hero__title">Tempo esgotado</h1>
+                        <p class="wh-hero__subtitle">A página de pagamento expirou antes da conclusão.</p>
+                    </div>
+                </section>
+                <section class="wh-main">
+                    <div class="wh-main__inner">
+                        <div class="wh-success-card">
+                            <h2 class="wh-success-card__title">Solicite um novo link</h2>
+                            <p class="wh-success-card__body">
+                                Por segurança, o link de pagamento tem tempo limitado.
+                                Solicite um novo link e tente novamente.
+                            </p>
+                            <a class="wh-btn-secondary" href="/afr_wellhub/inscricao/reenviar">
+                                <svg width="16" height="16" aria-hidden="true"><use href="#wh-i-mail"/></svg>
+                                Solicitar novo link
+                            </a>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </t>
+    </template>
 </odoo>

@@ -296,10 +296,7 @@ class AfrWellhubPortal(http.Controller):
         token = token.strip()
         Collab = request.env["wellhub.collaborator"].sudo()
         collab = Collab.search(
-            [
-                ("signup_token", "=", token),
-                ("signup_pending", "=", True),
-            ],
+            [("signup_token", "=", token)],
             limit=1,
         )
         if not collab:
@@ -315,7 +312,7 @@ class AfrWellhubPortal(http.Controller):
                 },
             )
         try:
-            collab.action_portal_activate_subscription()
+            checkout_url = collab.action_portal_activate_subscription()
         except UserError as e:
             return request.render(
                 "afr_wellhub.portal_wellhub_ativar_result",
@@ -335,22 +332,52 @@ class AfrWellhubPortal(http.Controller):
                     "show_asaas_email_preview": False,
                 },
             )
-        collab.invalidate_recordset()
-        collab = Collab.browse(collab.id)
-        preview = self._activation_asaas_email_preview_vals(collab)
-        return request.render(
-            "afr_wellhub.portal_wellhub_ativar_result",
-            {
-                "ok": True,
-                "message": _(
-                    "Inscrição confirmada. O contrato de assinatura recorrente foi registrado no Asaas.\n\n"
-                    "A «Assinatura Wellhub ativa» no sistema só ficará verdadeira após o pagamento "
-                    "da cobrança ser confirmado no Asaas (sincronização das cobranças).\n\n"
-                    "Leia abaixo o que falta fazer: verificar o e-mail e quitar a cobrança."
-                ),
-                **preview,
-            },
-        )
+        if not checkout_url:
+            _logger.warning(
+                "Wellhub ativação: ausente URL de checkout para colaborador id=%s", collab.id
+            )
+            return request.render(
+                "afr_wellhub.portal_wellhub_ativar_result",
+                {
+                    "ok": False,
+                    "message": _(
+                        "Não foi possível gerar o link de pagamento. "
+                        "Solicite um novo link em /afr_wellhub/inscricao/reenviar."
+                    ),
+                    "show_asaas_email_preview": False,
+                },
+            )
+        return request.redirect(checkout_url, code=303)
+
+    @http.route(
+        "/afr_wellhub/checkout/sucesso",
+        type="http",
+        auth="public",
+        website=True,
+        methods=["GET"],
+    )
+    def wellhub_checkout_sucesso(self, **kwargs):
+        return request.render("afr_wellhub.portal_wellhub_checkout_sucesso", {})
+
+    @http.route(
+        "/afr_wellhub/checkout/cancelado",
+        type="http",
+        auth="public",
+        website=True,
+        methods=["GET"],
+    )
+    def wellhub_checkout_cancelado(self, **kwargs):
+        return request.render("afr_wellhub.portal_wellhub_checkout_cancelado", {})
+
+    @http.route(
+        "/afr_wellhub/checkout/expirado",
+        type="http",
+        auth="public",
+        website=True,
+        methods=["GET"],
+    )
+    def wellhub_checkout_expirado(self, **kwargs):
+        return request.render("afr_wellhub.portal_wellhub_checkout_expirado", {})
 
     @http.route(
         "/afr_wellhub/inscricao/reenviar",
@@ -383,11 +410,17 @@ class AfrWellhubPortal(http.Controller):
             )
         Collab = request.env["wellhub.collaborator"].sudo()
         company = self._wellhub_company()
+        # Reenvio aceito também para colaboradores que clicaram em ativar (enrolled=True) mas
+        # ainda não pagaram o checkout — necessário para recuperar fluxo se o e-mail original foi
+        # perdido após abandono do checkout Asaas.
         collab = Collab.search(
             [
                 ("email", "=ilike", email_norm),
-                ("signup_pending", "=", True),
                 ("company_id", "=", company.id),
+                ("asaas_subscription_id", "=", False),
+                "|",
+                ("signup_pending", "=", True),
+                ("wellhub_subscription_enrolled", "=", True),
             ],
             limit=1,
         )

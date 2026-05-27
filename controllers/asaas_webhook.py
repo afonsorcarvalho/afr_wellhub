@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
-"""Webhook Asaas: cobranças com objeto `payment` no JSON.
+"""Webhook Asaas: cobranças (objeto `payment`) e checkouts (objeto `checkout`).
 
-Somente eventos e `billingType` alinhados à integração em cartão de crédito.
-Referência: https://docs.asaas.com/docs/webhook-para-cobrancas
+Cobranças: somente eventos e `billingType` alinhados à integração em cartão de crédito.
+Checkouts: eventos do produto Checkout (criação/pagamento/expiração/cancelamento).
+Referências:
+- https://docs.asaas.com/docs/webhook-para-cobrancas
+- https://docs.asaas.com/docs/eventos-para-checkout
 """
 
 import json
@@ -26,6 +29,16 @@ _ASAAS_WEBHOOK_PAYMENT_EVENTS_CREDIT_CARD = frozenset(
     }
 )
 
+# Eventos do produto Checkout (https://docs.asaas.com/docs/eventos-para-checkout).
+_ASAAS_WEBHOOK_CHECKOUT_EVENTS = frozenset(
+    {
+        "CHECKOUT_CREATED",
+        "CHECKOUT_PAID",
+        "CHECKOUT_EXPIRED",
+        "CHECKOUT_CANCELED",
+    }
+)
+
 
 class AfrWellhubAsaasWebhook(http.Controller):
     @http.route(
@@ -37,7 +50,7 @@ class AfrWellhubAsaasWebhook(http.Controller):
         save_session=False,
     )
     def asaas_webhook(self, **kwargs):
-        """Valida `asaas-access-token`; processa só eventos da whitelist e cobrança CREDIT_CARD."""
+        """Valida `asaas-access-token`; despacha eventos de payment (cartão) e de checkout."""
         expected = (
             request.env["ir.config_parameter"]
             .sudo()
@@ -54,8 +67,24 @@ class AfrWellhubAsaasWebhook(http.Controller):
         except (UnicodeDecodeError, json.JSONDecodeError):
             return request.make_response("Bad Request", status=400)
 
-        payment = body.get("payment")
         event = (body.get("event") or "").strip().upper()
+
+        if event in _ASAAS_WEBHOOK_CHECKOUT_EVENTS:
+            checkout = body.get("checkout")
+            if not isinstance(checkout, dict) or not checkout.get("id"):
+                _logger.debug(
+                    "Asaas webhook: ignorado (sem objeto checkout ou id). event=%s", event
+                )
+                return request.make_response("OK", status=200)
+            try:
+                request.env["wellhub.collaborator"].sudo()._webhook_process_checkout(
+                    checkout, event
+                )
+            except Exception:
+                _logger.exception("Asaas webhook: falha ao processar checkout.")
+            return request.make_response("OK", status=200)
+
+        payment = body.get("payment")
 
         if not isinstance(payment, dict) or not payment.get("id"):
             _logger.debug(

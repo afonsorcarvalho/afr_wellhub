@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Colaborador Wellhub: cadastro local; assinatura ativa dispara assinatura recorrente no Asaas."""
 
+import json
 import logging
 import secrets
 from datetime import timedelta
@@ -104,6 +105,23 @@ class WellhubCollaborator(models.Model):
 
     asaas_customer_id = fields.Char(string="Cliente Asaas", readonly=True)
     asaas_subscription_id = fields.Char(string="Assinatura Asaas", readonly=True)
+
+    asaas_checkout_id = fields.Char(string="Checkout Asaas (id)", readonly=True)
+    asaas_checkout_url = fields.Char(string="URL do checkout Asaas", readonly=True)
+    asaas_checkout_status = fields.Selection(
+        selection=[
+            ("CREATED", "Criado"),
+            ("PAID", "Pago"),
+            ("EXPIRED", "Expirado"),
+            ("CANCELED", "Cancelado"),
+        ],
+        string="Status do checkout Asaas",
+        readonly=True,
+    )
+    asaas_checkout_expires_at = fields.Datetime(
+        string="Checkout Asaas expira em",
+        readonly=True,
+    )
 
     subscription_value = fields.Float(
         string="Valor da assinatura (base)",
@@ -476,13 +494,29 @@ class WellhubCollaborator(models.Model):
         return records
 
     def _sync_asaas_subscription_state(self):
-        """Ativação: cria cliente + assinatura. Desativação: remove assinatura no Asaas."""
+        """Ativação: cria cliente + (checkout se portal, senão assinatura direto). Desativação: remove assinatura no Asaas."""
         api = self.env["afr.wellhub.asaas.api"]
         for rec in self:
             if not rec.id:
                 continue
             if rec.wellhub_subscription_enrolled:
                 if rec.asaas_subscription_id:
+                    continue
+                if rec.portal_inscription:
+                    # Fluxo portal: subscription nasce no webhook CHECKOUT_PAID; aqui só
+                    # garantimos customer e checkout válido.
+                    try:
+                        customer_id = api.customer_ensure(rec)
+                        rec.with_context(afr_wellhub_skip_asaas_sync=True).write(
+                            {"asaas_customer_id": customer_id}
+                        )
+                        rec._ensure_active_checkout()
+                    except UserError:
+                        raise
+                    except Exception as e:
+                        raise UserError(
+                            _("Não foi possível criar o checkout no Asaas: %s") % str(e)
+                        ) from e
                     continue
                 try:
                     customer_id = api.customer_ensure(rec)
@@ -515,6 +549,46 @@ class WellhubCollaborator(models.Model):
                     rec.with_context(afr_wellhub_skip_asaas_sync=True).write(
                         {"asaas_subscription_id": False}
                     )
+
+    def _ensure_active_checkout(self):
+        """Retorna URL do checkout vigente; reusa se ainda válido (CREATED + não expirado), senão cria novo.
+
+        Documentação: https://docs.asaas.com/docs/checkout-com-assinatura-recorrente
+        """
+        self.ensure_one()
+        now = fields.Datetime.from_string(fields.Datetime.now())
+        if (
+            self.asaas_checkout_id
+            and self.asaas_checkout_url
+            and self.asaas_checkout_status == "CREATED"
+            and self.asaas_checkout_expires_at
+            and self.asaas_checkout_expires_at > now
+        ):
+            return self.asaas_checkout_url
+
+        api = self.env["afr.wellhub.asaas.api"]
+        response = api.checkout_create(self)
+        checkout_id = (response.get("id") or "").strip()
+        checkout_url = api.checkout_extract_url(response)
+        if not checkout_id or not checkout_url:
+            _logger.warning(
+                "Asaas checkout: resposta sem id ou url. response=%s",
+                json.dumps(response)[:500] if isinstance(response, dict) else str(response)[:500],
+            )
+            raise UserError(
+                _("Resposta inesperada do Asaas ao criar checkout (id ou URL ausente).")
+            )
+        minutes = api._checkout_minutes_to_expire()
+        expires_at = now + timedelta(minutes=minutes)
+        self.with_context(afr_wellhub_skip_asaas_sync=True).write(
+            {
+                "asaas_checkout_id": checkout_id,
+                "asaas_checkout_url": checkout_url,
+                "asaas_checkout_status": "CREATED",
+                "asaas_checkout_expires_at": fields.Datetime.to_string(expires_at),
+            }
+        )
+        return checkout_url
 
     def _sync_payments_from_asaas_impl(self):
         """Atualiza espelhos e status das cobranças via GET /v3/payments (sem UI)."""
@@ -580,6 +654,81 @@ class WellhubCollaborator(models.Model):
             payment, collab
         )
         collab._compute_wellhub_subscription_status()
+
+    @api.model
+    def _webhook_process_checkout(self, checkout, event):
+        """Atualiza status do checkout local e, em CHECKOUT_PAID, vincula asaas_subscription_id.
+
+        Localiza o colaborador por `externalReference` (formato `afr_wh_co_{id}`); fallback por
+        `asaas_checkout_id` igual a `checkout.id`. Quando o evento for `CHECKOUT_PAID`, tenta extrair
+        `subscription.id` do payload e, se ausente, faz GET /v3/subscriptions filtrando pela
+        externalReference da assinatura (`afr_wh_sub_{id}`).
+        """
+        if not isinstance(checkout, dict):
+            return
+        checkout_id = (checkout.get("id") or "").strip()
+        if not checkout_id:
+            return
+        ext_ref = (checkout.get("externalReference") or "").strip()
+        collab = self.browse()
+        if ext_ref.startswith("afr_wh_co_"):
+            try:
+                collab_id = int(ext_ref.split("_")[-1])
+            except (TypeError, ValueError):
+                collab_id = 0
+            if collab_id:
+                collab = self.sudo().browse(collab_id).exists()
+        if not collab:
+            collab = self.sudo().search(
+                [("asaas_checkout_id", "=", checkout_id)], limit=1
+            )
+        if not collab:
+            _logger.warning(
+                "Asaas webhook checkout: colaborador não encontrado. event=%s checkout_id=%s ext_ref=%s",
+                event,
+                checkout_id,
+                ext_ref or "—",
+            )
+            return
+
+        status_map = {
+            "CHECKOUT_CREATED": "CREATED",
+            "CHECKOUT_PAID": "PAID",
+            "CHECKOUT_EXPIRED": "EXPIRED",
+            "CHECKOUT_CANCELED": "CANCELED",
+        }
+        new_status = status_map.get(event)
+        if not new_status:
+            return
+
+        vals = {
+            "asaas_checkout_status": new_status,
+            "asaas_checkout_id": collab.asaas_checkout_id or checkout_id,
+        }
+        if event == "CHECKOUT_PAID":
+            if not collab.asaas_subscription_id:
+                sub_obj = checkout.get("subscription")
+                sub_id = ""
+                if isinstance(sub_obj, dict):
+                    sub_id = (sub_obj.get("id") or "").strip()
+                if not sub_id:
+                    api = self.env["afr.wellhub.asaas.api"]
+                    sub_id = (
+                        api.subscription_find_by_external_reference(
+                            collab._asaas_subscription_external_reference()
+                        )
+                        or api.subscription_find_latest_for_customer(collab.asaas_customer_id)
+                        or ""
+                    )
+                if sub_id:
+                    vals["asaas_subscription_id"] = sub_id
+            vals.update(
+                {
+                    "signup_token": False,
+                    "signup_token_expiry": False,
+                }
+            )
+        collab.with_context(afr_wellhub_skip_asaas_sync=True).write(vals)
 
     def action_sync_wellhub_api(self):
         """Placeholder para integração futura com API Wellhub (sem documentação no escopo atual)."""
@@ -845,10 +994,29 @@ class WellhubCollaborator(models.Model):
         }
 
     def action_portal_activate_subscription(self):
-        """Ativa assinatura Wellhub após confirmação do e-mail (padrões configurados para o portal)."""
+        """Ativa assinatura Wellhub após confirmação do e-mail (idempotente para re-cliques pré-pagamento).
+
+        - Primeira chamada (`signup_pending=True`): grava padrões do portal e dispara a criação do
+          checkout no Asaas (via `_sync_asaas_subscription_state`).
+        - Chamadas subsequentes antes do pagamento (`wellhub_subscription_enrolled=True` sem
+          `asaas_subscription_id`): retorna URL cached ou regenera via `_ensure_active_checkout`.
+        - Já pago (`asaas_subscription_id` presente): erro de "já ativada".
+
+        Token e `signup_pending` permanecem até o webhook `CHECKOUT_PAID` (vide `_webhook_process_checkout`).
+        """
         self.ensure_one()
-        if not self.signup_pending or not self.signup_token:
+        if self.asaas_subscription_id:
             raise UserError(_("Esta inscrição já foi confirmada ou não é válida."))
+        if not self.signup_token:
+            raise UserError(_("Esta inscrição já foi confirmada ou não é válida."))
+
+        if self.wellhub_subscription_enrolled:
+            # Re-click idempotente após enrollment: regenera/reusa checkout sem reexigir validade do token.
+            # IMPORTANTE: este caminho também recupera de falha parcial — se _ensure_active_checkout
+            # falhou na primeira ativação (Asaas indisponível), o write() já gravou enrolled=True;
+            # próximo click cai aqui e tenta criar o checkout novamente.
+            return self._ensure_active_checkout()
+
         now = fields.Datetime.from_string(fields.Datetime.now())
         if self.signup_token_expiry:
             exp = fields.Datetime.from_string(self.signup_token_expiry)
@@ -856,6 +1024,7 @@ class WellhubCollaborator(models.Model):
                 raise UserError(
                     _("O link de ativação expirou. Solicite uma nova inscrição ou contate o suporte.")
                 )
+
         cfg = self._get_portal_subscription_config()
         if cfg["subscription_value"] <= 0:
             raise UserError(
@@ -864,15 +1033,17 @@ class WellhubCollaborator(models.Model):
                     "em Ajustes (Wellhub / Asaas) antes de permitir ativações pelo portal."
                 )
             )
+        # billing_type forçado a CREDIT_CARD no fluxo do portal porque o checkout Asaas
+        # é criado com billingTypes=["CREDIT_CARD"]. Necessário para que o gross-up de taxa
+        # do cartão em `subscription_value_for_asaas` seja aplicado (alinha valor cobrado e
+        # absorção da taxa). Se um dia o checkout passar a aceitar mais meios, ajustar aqui.
         vals = {
             "signup_pending": False,
-            "signup_token": False,
-            "signup_token_expiry": False,
             "signup_email_confirmed_at": fields.Datetime.now(),
             "portal_inscription": True,
             "wellhub_subscription_enrolled": True,
             "subscription_value": cfg["subscription_value"],
-            "billing_type": cfg["billing_type"] or False,
+            "billing_type": "CREDIT_CARD",
             "subscription_cycle": cfg["subscription_cycle"] or False,
             "next_due_date": fields.Date.context_today(self),
             "pass_asaas_notification_email_sms_fee": cfg["pass_asaas_notification_email_sms_fee"],
@@ -885,7 +1056,7 @@ class WellhubCollaborator(models.Model):
             "asaas_fine_value": cfg["asaas_fine_value"],
         }
         self.write(vals)
-        return True
+        return self.asaas_checkout_url or False
 
     @api.model
     def _portal_signup_token_expiry_string(self):

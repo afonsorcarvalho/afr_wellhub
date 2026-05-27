@@ -419,6 +419,152 @@ class AfrWellhubAsaasApi(models.AbstractModel):
         return self._request("DELETE", f"/v3/subscriptions/{subscription_id}")
 
     @api.model
+    def _checkout_external_reference(self, collaborator):
+        self.env["wellhub.collaborator"].browse(collaborator.id).ensure_one()
+        return f"afr_wh_co_{collaborator.id}"
+
+    @api.model
+    def _checkout_minutes_to_expire(self):
+        try:
+            raw = int(
+                self._get_config_param("afr_wellhub.checkout_minutes_to_expire", "1440")
+            )
+        except ValueError:
+            raw = 1440
+        return max(10, min(1440, raw))
+
+    @api.model
+    def _checkout_callback_urls(self):
+        base = (
+            self.env["ir.config_parameter"]
+            .sudo()
+            .get_param("web.base.url", "")
+            or ""
+        ).rstrip("/")
+        if not base:
+            raise UserError(
+                _("Configure web.base.url nas configurações antes de criar checkout no Asaas.")
+            )
+        return {
+            "successUrl": f"{base}/afr_wellhub/checkout/sucesso",
+            "cancelUrl": f"{base}/afr_wellhub/checkout/cancelado",
+            "expiredUrl": f"{base}/afr_wellhub/checkout/expirado",
+        }
+
+    @api.model
+    def _checkout_customer_data_payload(self, collaborator):
+        cpf_cnpj = re.sub(r"\D", "", collaborator.cpf_cnpj or "")
+        phone_digits = re.sub(r"\D", "", collaborator.phone or "")
+        data = {
+            "name": collaborator.name or "",
+            "email": collaborator.email or "",
+            "cpfCnpj": cpf_cnpj,
+        }
+        if phone_digits:
+            data["phone"] = phone_digits
+        return data
+
+    @api.model
+    def _checkout_subscription_payload(self, collaborator):
+        cycle = collaborator.subscription_cycle or self._get_config_param(
+            "afr_wellhub.default_cycle", "MONTHLY"
+        )
+        next_due = collaborator.next_due_date or fields.Date.context_today(collaborator)
+        # externalReference no bloco subscription: doc oficial não documenta, mas se Asaas aceitar
+        # facilita a localização via subscription_find_by_external_reference no webhook CHECKOUT_PAID.
+        return {
+            "cycle": cycle,
+            "nextDueDate": next_due.strftime("%Y-%m-%d"),
+            "externalReference": collaborator._asaas_subscription_external_reference(),
+        }
+
+    @api.model
+    def checkout_create(self, collaborator):
+        """POST /v3/checkouts — cria checkout Asaas com assinatura recorrente (CREDIT_CARD).
+
+        Documentação: https://docs.asaas.com/reference/criar-novo-checkout
+        Guia: https://docs.asaas.com/docs/checkout-com-assinatura-recorrente
+        """
+        self.env["wellhub.collaborator"].browse(collaborator.id).ensure_one()
+        value = self.subscription_value_for_asaas(collaborator)
+        if value <= 0:
+            raise UserError(
+                _("Defina o valor da assinatura no colaborador ou nas configurações.")
+            )
+        cpf_cnpj = re.sub(r"\D", "", collaborator.cpf_cnpj or "")
+        if not cpf_cnpj:
+            raise UserError(
+                _("CPF/CNPJ é obrigatório para criar o checkout no Asaas.")
+            )
+        payload = {
+            "billingTypes": ["CREDIT_CARD"],
+            "chargeTypes": ["RECURRENT"],
+            "minutesToExpire": self._checkout_minutes_to_expire(),
+            "callback": self._checkout_callback_urls(),
+            "items": [
+                {
+                    "name": _("Assinatura Wellhub"),
+                    "description": collaborator.name or "",
+                    "quantity": 1,
+                    "value": value,
+                }
+            ],
+            "customerData": self._checkout_customer_data_payload(collaborator),
+            "subscription": self._checkout_subscription_payload(collaborator),
+            "externalReference": self._checkout_external_reference(collaborator),
+        }
+        return self._request("POST", "/v3/checkouts", json_body=payload)
+
+    @api.model
+    def checkout_get(self, checkout_id):
+        if not checkout_id:
+            return {}
+        return self._request("GET", f"/v3/checkouts/{checkout_id}")
+
+    @api.model
+    def checkout_extract_url(self, checkout_response):
+        """Resposta Asaas não documenta nome exato do campo URL — tenta candidatos comuns."""
+        if not isinstance(checkout_response, dict):
+            return ""
+        for key in ("url", "link", "checkoutUrl", "paymentLink", "invoiceUrl"):
+            value = checkout_response.get(key)
+            if isinstance(value, str) and value.strip():
+                return value.strip()
+        return ""
+
+    @api.model
+    def subscription_find_by_external_reference(self, external_ref):
+        """GET /v3/subscriptions?externalReference= — usado quando webhook CHECKOUT_PAID não trazer subscription.id."""
+        if not external_ref:
+            return None
+        data = self._request(
+            "GET",
+            "/v3/subscriptions",
+            params={"externalReference": external_ref, "limit": 10},
+        )
+        for item in data.get("data") or []:
+            sid = (item.get("id") or "").strip()
+            if sid:
+                return sid
+        return None
+
+    @api.model
+    def subscription_find_latest_for_customer(self, customer_id):
+        """GET /v3/subscriptions?customer= — fallback quando externalReference da subscription criada via checkout não corresponde à nossa convenção."""
+        if not customer_id:
+            return None
+        data = self._request(
+            "GET",
+            "/v3/subscriptions",
+            params={"customer": customer_id, "limit": 10},
+        )
+        for item in data.get("data") or []:
+            sid = (item.get("id") or "").strip()
+            if sid:
+                return sid
+        return None
+
+    @api.model
     def payments_list(self, customer_id=None, subscription_id=None, offset=0, limit=100):
         params = {"offset": offset, "limit": min(limit, 100)}
         if customer_id:
