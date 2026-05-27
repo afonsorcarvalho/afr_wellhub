@@ -713,10 +713,27 @@ class WellhubCollaborator(models.Model):
         updates = {}
         if customer_id and customer_id != (collab.asaas_customer_id or ""):
             updates["asaas_customer_id"] = customer_id
-        if subscription_id and subscription_id != (collab.asaas_subscription_id or ""):
+        # Quando a subscription_id é descoberta agora (não havia antes), aplica metadata
+        # local (description, juros, multa, notifyCustomer) na subscription Asaas via PUT —
+        # o Checkout não propaga esses campos na criação automática da subscription, e nem
+        # sempre o evento CHECKOUT_PAID dispara antes do PAYMENT_*.
+        subscription_just_discovered = bool(
+            subscription_id and subscription_id != (collab.asaas_subscription_id or "")
+        )
+        if subscription_just_discovered:
             updates["asaas_subscription_id"] = subscription_id
         if updates:
             collab.with_context(afr_wellhub_skip_asaas_sync=True).write(updates)
+        if subscription_just_discovered:
+            try:
+                self.env["afr.wellhub.asaas.api"].subscription_apply_local_metadata(
+                    collab, subscription_id
+                )
+            except Exception:
+                _logger.exception(
+                    "Wellhub webhook payment: falha ao aplicar metadados em %s "
+                    "(collaborator id=%s).", subscription_id, collab.id,
+                )
         self.env["wellhub.asaas.payment"].sudo().upsert_from_asaas_payment_dict(
             payment, collab
         )
