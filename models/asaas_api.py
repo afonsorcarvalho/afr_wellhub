@@ -15,6 +15,11 @@ _logger = logging.getLogger(__name__)
 ASAAS_PRODUCTION = "https://api.asaas.com"
 ASAAS_SANDBOX = "https://api-sandbox.asaas.com"
 
+# Frontend host (página hospedada de checkout, não da API). Usado para absolutizar
+# URLs relativas retornadas em POST /v3/checkouts (campo `link`/`url`/etc.).
+ASAAS_FRONTEND_PRODUCTION = "https://www.asaas.com"
+ASAAS_FRONTEND_SANDBOX = "https://sandbox.asaas.com"
+
 # Nome do grupo de clientes no Asaas para quem se inscreve pelo portal (campo groupName).
 # Documentação: CustomerSaveRequestDTO / CustomerUpdateRequestDTO — não há endpoint para
 # criar grupo vazio; o agrupamento existe ao atribuir groupName ao cliente.
@@ -37,6 +42,13 @@ class AfrWellhubAsaasApi(models.AbstractModel):
         if env_type == "production":
             return ASAAS_PRODUCTION
         return ASAAS_SANDBOX
+
+    @api.model
+    def _frontend_base_url(self):
+        env_type = self._get_config_param("afr_wellhub.asaas_environment", "sandbox")
+        if env_type == "production":
+            return ASAAS_FRONTEND_PRODUCTION
+        return ASAAS_FRONTEND_SANDBOX
 
     @api.model
     def _api_key(self):
@@ -544,13 +556,25 @@ class AfrWellhubAsaasApi(models.AbstractModel):
 
     @api.model
     def checkout_extract_url(self, checkout_response):
-        """Resposta Asaas não documenta nome exato do campo URL — tenta candidatos comuns."""
+        """Resposta Asaas não documenta nome exato do campo URL — tenta candidatos comuns.
+
+        Se o valor retornado for relativo (ex.: `/checkoutSession/show/<uuid>`), prefixa com
+        o host do frontend Asaas (sandbox.asaas.com ou www.asaas.com) para evitar que o browser
+        siga o 303 contra o host do nosso portal e dispare 404 local.
+        """
         if not isinstance(checkout_response, dict):
             return ""
         for key in ("url", "link", "checkoutUrl", "paymentLink", "invoiceUrl"):
             value = checkout_response.get(key)
-            if isinstance(value, str) and value.strip():
-                return value.strip()
+            if not isinstance(value, str) or not value.strip():
+                continue
+            value = value.strip()
+            if value.startswith(("http://", "https://")):
+                return value
+            base = self._frontend_base_url().rstrip("/")
+            if not value.startswith("/"):
+                value = "/" + value
+            return base + value
         return ""
 
     @api.model

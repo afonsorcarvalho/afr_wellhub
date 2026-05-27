@@ -579,14 +579,16 @@ class WellhubCollaborator(models.Model):
         """
         self.ensure_one()
         now = fields.Datetime.from_string(fields.Datetime.now())
+        cached_url = (self.asaas_checkout_url or "").strip()
+        cached_ok = cached_url.startswith(("http://", "https://"))
         if (
             self.asaas_checkout_id
-            and self.asaas_checkout_url
+            and cached_ok
             and self.asaas_checkout_status == "CREATED"
             and self.asaas_checkout_expires_at
             and self.asaas_checkout_expires_at > now
         ):
-            return self.asaas_checkout_url
+            return cached_url
 
         api = self.env["afr.wellhub.asaas.api"]
         response = api.checkout_create(self)
