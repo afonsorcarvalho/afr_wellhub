@@ -662,6 +662,25 @@ class WellhubCollaborator(models.Model):
                 if not chunk:
                     break
             Payment.mark_absent_from_sync_as_excluded(rec, seen_ids)
+            # Backfill do vínculo de assinatura no colaborador. O Checkout cria a subscription
+            # no Asaas, mas sem o webhook CHECKOUT_PAID/PAYMENT_* o campo asaas_subscription_id
+            # local fica vazio — e o cálculo de «Assinatura ativa»/adimplência depende dele. As
+            # cobranças espelhadas trazem o `subscription`; adota o da cobrança mais recente
+            # (payment_ids vem ordenado por due_date desc, id desc) quando o colaborador ainda
+            # não tem assinatura vinculada. Idempotente; não altera vínculo já existente.
+            if not rec.asaas_subscription_id:
+                latest_sub = next(
+                    (
+                        p.asaas_subscription_id.strip()
+                        for p in rec.payment_ids
+                        if (p.asaas_subscription_id or "").strip()
+                    ),
+                    "",
+                )
+                if latest_sub:
+                    rec.with_context(afr_wellhub_skip_asaas_sync=True).write(
+                        {"asaas_subscription_id": latest_sub}
+                    )
             # Atualiza campos armazenados «Assinatura Wellhub ativa» / adimplência após o espelho.
             rec._compute_wellhub_subscription_status()
 
