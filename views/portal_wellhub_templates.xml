@@ -255,7 +255,7 @@
                                             <small id="wh_state_uf_feedback" class="wh-field__feedback" aria-live="polite">Selecione o estado.</small>
                                         </div>
 
-                                        <button type="submit" class="wh-btn-primary" data-state="idle" disabled="disabled">
+                                        <button type="submit" class="wh-btn-primary" data-state="idle">
                                             <span class="wh-btn-primary__icon-idle" aria-hidden="true">
                                                 <svg width="20" height="20"><use href="#wh-i-arrow-right"/></svg>
                                             </span>

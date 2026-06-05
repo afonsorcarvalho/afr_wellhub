@@ -386,10 +386,12 @@
         if (counter) {
             counter.textContent = String(validCount);
         }
-        var btn = form.querySelector(".wh-btn-primary");
-        if (btn && btn.getAttribute("data-state") === "idle") {
-            btn.disabled = validCount !== total;
-        }
+        // O botão NÃO é mais travado por validação reativa: o autofill do iOS Safari
+        // preenche os campos sem disparar `input`, então `validCount` ficava < total e
+        // o botão permanecia `disabled` para sempre (usuário não conseguia enviar mesmo
+        // com tudo preenchido). A validação no submit (handler abaixo) relê os valores
+        // reais e bloqueia o envio se inválido; o server também valida. A barra/contador
+        // seguem refletindo o progresso de forma puramente cosmética.
     }
 
     function evaluateField(key, form, opts) {
@@ -450,6 +452,28 @@
             }
         });
         recomputeProgress(form);
+
+        // Garante o botão clicável assim que o JS roda (template nasce `disabled` como
+        // fallback no-JS; com JS ativo a validação acontece no clique/submit).
+        var primaryBtn = form.querySelector(".wh-btn-primary");
+        if (primaryBtn && primaryBtn.getAttribute("data-state") === "idle") {
+            primaryBtn.disabled = false;
+        }
+
+        // Detecção de autofill (iOS Safari / gerenciadores de senha): o navegador preenche
+        // os campos SEM disparar `input`, então máscaras, validação e lookup de CEP não
+        // rodavam. O hack `:-webkit-autofill` + `@keyframes wh-autofill-detect` (SCSS) faz
+        // o WebKit emitir `animationstart` no momento do autofill; aqui reagimos disparando
+        // um `input` sintético, que reaproveita TODA a lógica já ligada ao campo.
+        form.addEventListener("animationstart", function (ev) {
+            if (ev.animationName !== "wh-autofill-detect") return;
+            var input = ev.target;
+            if (!input || !input.classList || !input.classList.contains("wh-field__input")) {
+                return;
+            }
+            input.dataset.whTouched = "1";
+            input.dispatchEvent(new Event("input", { bubbles: true }));
+        });
 
         // Intercepta submit: se inválido, shake + foco; se válido, estado loading.
         form.addEventListener("submit", function (ev) {

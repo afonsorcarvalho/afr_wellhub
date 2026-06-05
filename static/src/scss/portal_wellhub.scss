@@ -261,7 +261,21 @@
     &:-webkit-autofill {
         -webkit-box-shadow: 0 0 0px 1000px var(--wh-surface) inset;
         -webkit-text-fill-color: var(--wh-ink-900);
+        // Gatilho de detecção de autofill: o WebKit aplica esta pseudo-classe ao
+        // preencher o campo e dispara `animationstart` (capturado no JS) — o iOS Safari
+        // não emite `input` no autofill, então máscaras/validação dependem deste sinal.
+        animation-name: wh-autofill-detect;
+        animation-duration: 1ms;
     }
+}
+
+// Keyframe só serve para o WebKit emitir `animationstart` ao autofill.
+// Ver portal_wellhub_inscricao.js (listener `wh-autofill-detect`).
+// Declaração real (no-op visual) para o Dart Sass não descartar o bloco como vazio —
+// sem o keyframe presente no CSS compilado, `animation-name` não dispara o evento.
+@keyframes wh-autofill-detect {
+    from { background-color: transparent; }
+    to { background-color: transparent; }
 }
 
 .wh-field__label {
