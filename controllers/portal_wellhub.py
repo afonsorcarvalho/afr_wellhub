@@ -184,6 +184,18 @@ class AfrWellhubPortal(http.Controller):
         }
 
     @http.route(
+        "/afr_wellhub/como-funciona",
+        type="http",
+        auth="public",
+        website=True,
+        sitemap=True,
+        methods=["GET"],
+    )
+    def wellhub_como_funciona(self, **kwargs):
+        """Página pública educativa: explica a jornada do benefício Wellhub."""
+        return request.render("afr_wellhub.portal_wellhub_como_funciona", {})
+
+    @http.route(
         "/afr_wellhub/inscricao",
         type="http",
         auth="public",

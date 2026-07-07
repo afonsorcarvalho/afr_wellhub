@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
+        <record id="menu_wellhub_como_funciona" model="website.menu">
+            <field name="name">Como funciona</field>
+            <field name="url">/afr_wellhub/como-funciona</field>
+            <field name="website_id" ref="website.default_website"/>
+            <field name="parent_id" ref="website.main_menu"/>
+            <field name="sequence" eval="54"/>
+        </record>
+
         <record id="menu_wellhub_inscricao" model="website.menu">
             <field name="name">Inscrição Wellhub</field>
             <field name="url">/afr_wellhub/inscricao</field>

@@ -42,6 +42,31 @@
             <symbol id="wh-i-play" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M8 5v14l11-7z"/>
             </symbol>
+            <symbol id="wh-i-building" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 21h18M6 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16"/>
+                <path d="M9 7h.01M15 7h.01M9 11h.01M15 11h.01M9 15h.01M15 15h.01"/>
+            </symbol>
+            <symbol id="wh-i-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 3v12M8 11l4 4 4-4M5 21h14"/>
+            </symbol>
+            <symbol id="wh-i-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z"/>
+                <circle cx="12" cy="10" r="2.5"/>
+            </symbol>
+            <symbol id="wh-i-heart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 20.5 3.8 12.3a5 5 0 0 1 7.1-7.05L12 6.3l1.1-1.05a5 5 0 0 1 7.1 7.05z"/>
+            </symbol>
+            <symbol id="wh-i-dumbbell" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6.5 6.5 17.5 17.5M4 8l-1.5 1.5a1.5 1.5 0 0 0 0 2.1L4 13M20 16l1.5-1.5a1.5 1.5 0 0 0 0-2.1L20 11M8 4 6.5 5.5a1.5 1.5 0 0 0 0 2.1L8 9M16 15l1.5 1.5a1.5 1.5 0 0 1 0 2.1L16 20"/>
+            </symbol>
+            <symbol id="wh-i-calendar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4.5" width="18" height="16" rx="2"/>
+                <path d="M3 9h18M8 3v3M16 3v3"/>
+            </symbol>
+            <symbol id="wh-i-globe" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="9"/>
+                <path d="M3 12h18M12 3c2.5 2.5 3.8 5.7 3.8 9S14.5 18.5 12 21c-2.5-2.5-3.8-5.7-3.8-9S9.5 5.5 12 3z"/>
+            </symbol>
         </svg>
     </template>
 
@@ -750,6 +775,196 @@
                                 Solicitar novo link
                             </a>
                         </div>
+                    </div>
+                </section>
+            </div>
+        </t>
+    </template>
+
+    <template id="portal_wellhub_como_funciona" name="Wellhub: como funciona (página educativa)">
+        <t t-call="website.layout">
+            <div id="wrap" class="oe_structure wh-portal">
+                <t t-call="afr_wellhub.wh_icon_sprite"/>
+
+                <!-- Hero -->
+                <section class="wh-hero" aria-label="Como funciona o Wellhub">
+                    <div class="wh-hero__inner">
+                        <span class="wh-hero__badge">
+                            <svg aria-hidden="true" focusable="false" width="14" height="14"><use href="#wh-i-sparkle"/></svg>
+                            Benefício Wellhub
+                        </span>
+                        <h1 class="wh-hero__title">Como funciona o Wellhub</h1>
+                        <p class="wh-hero__subtitle">
+                            Do momento em que sua empresa libera o benefício até o seu primeiro
+                            check-in numa academia — veja cada passo, sem complicação.
+                        </p>
+                    </div>
+                </section>
+
+                <section class="wh-main">
+                    <div class="wh-main__inner wh-doc">
+
+                        <!-- O que é -->
+                        <div class="wh-block">
+                            <h2 class="wh-block__title">O que é o Wellhub</h2>
+                            <p class="wh-block__lead">
+                                O Wellhub (antigo Gympass) é como um "streaming de academias":
+                                com uma única mensalidade você acessa milhares de academias,
+                                estúdios e aplicativos de bem-estar — treino, meditação, terapia
+                                e nutrição — quando e onde quiser.
+                            </p>
+                            <div class="wh-features">
+                                <div class="wh-feature">
+                                    <span class="wh-feature__icon" aria-hidden="true"><svg><use href="#wh-i-dumbbell"/></svg></span>
+                                    <p class="wh-feature__title">+100 mil locais</p>
+                                    <p class="wh-feature__text">Academias e estúdios parceiros por todo o Brasil.</p>
+                                </div>
+                                <div class="wh-feature">
+                                    <span class="wh-feature__icon" aria-hidden="true"><svg><use href="#wh-i-sparkle"/></svg></span>
+                                    <p class="wh-feature__title">Uma mensalidade</p>
+                                    <p class="wh-feature__text">Valor único mensal, sem taxa de adesão.</p>
+                                </div>
+                                <div class="wh-feature">
+                                    <span class="wh-feature__icon" aria-hidden="true"><svg><use href="#wh-i-heart"/></svg></span>
+                                    <p class="wh-feature__title">Bem-estar completo</p>
+                                    <p class="wh-feature__text">Corpo e mente: apps de meditação, terapia e nutrição.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Jornada em passos -->
+                        <div class="wh-steps-card">
+                            <h2 class="wh-steps-card__title">Sua jornada, passo a passo</h2>
+                            <ol class="wh-steps">
+                                <li class="wh-steps__item">
+                                    <strong>Elegibilidade pela empresa.</strong>
+                                    Sua empresa oferece o Wellhub como benefício. É isso que
+                                    libera o seu acesso à plataforma.
+                                </li>
+                                <li class="wh-steps__item">
+                                    <strong>Inscrição neste portal.</strong>
+                                    Preencha o formulário de inscrição colaborador com seus dados.
+                                    Você recebe um e-mail com o link de confirmação.
+                                </li>
+                                <li class="wh-steps__item">
+                                    <strong>Confirmação e pagamento.</strong>
+                                    Clique no link do e-mail para ativar a inscrição e conclua o
+                                    pagamento da mensalidade. Só depois disso o benefício fica ativo.
+                                </li>
+                                <li class="wh-steps__item">
+                                    <strong>Cadastro no Wellhub.</strong>
+                                    Com a inscrição confirmada, você é registrado na plataforma
+                                    Wellhub oficial pela empresa.
+                                </li>
+                                <li class="wh-steps__item">
+                                    <strong>Baixe o app Wellhub.</strong>
+                                    Instale o aplicativo Wellhub no seu celular (Android ou iPhone)
+                                    pela loja de apps.
+                                </li>
+                                <li class="wh-steps__item">
+                                    <strong>Crie a conta e confirme a empresa.</strong>
+                                    No app, crie sua conta usando o mesmo e-mail e confirme os dados
+                                    da sua empresa para liberar o acesso.
+                                </li>
+                                <li class="wh-steps__item">
+                                    <strong>Escolha o seu plano.</strong>
+                                    Selecione o plano com as opções de bem-estar que você quer usar.
+                                    Pronto — é só começar.
+                                </li>
+                            </ol>
+                        </div>
+
+                        <!-- Primeiro check-in -->
+                        <div class="wh-block">
+                            <h2 class="wh-block__title">
+                                <span class="wh-block__title-icon" aria-hidden="true"><svg><use href="#wh-i-pin"/></svg></span>
+                                Seu primeiro check-in
+                            </h2>
+                            <p class="wh-block__lead">
+                                O check-in é o que libera sua entrada na academia. Faça sempre pelo
+                                app, quando já estiver perto do local.
+                            </p>
+                            <ol class="wh-tips" aria-label="Passos do check-in">
+                                <li class="wh-tips__item">
+                                    <span class="wh-tips__num">1</span>
+                                    <p class="wh-tips__text">Abra o app e toque no botão <strong>check-in</strong> (no canto inferior).</p>
+                                </li>
+                                <li class="wh-tips__item">
+                                    <span class="wh-tips__num">2</span>
+                                    <p class="wh-tips__text">Veja os <strong>locais próximos</strong>, mostrados pela sua localização (GPS).</p>
+                                </li>
+                                <li class="wh-tips__item">
+                                    <span class="wh-tips__num">3</span>
+                                    <p class="wh-tips__text">Escolha a <strong>atividade</strong> e confirme o check-in perto do local.</p>
+                                </li>
+                            </ol>
+                            <div class="wh-alert wh-alert--warning" role="note">
+                                <span class="wh-alert__icon" aria-hidden="true"><svg><use href="#wh-i-info"/></svg></span>
+                                <div class="wh-alert__body">
+                                    Faça o check-in só quando estiver no local. Se cancelar fora do
+                                    prazo ou não comparecer, você pode ficar sem acessar outra
+                                    academia no mesmo dia.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Além da academia -->
+                        <div class="wh-block">
+                            <h2 class="wh-block__title">Vai muito além da academia</h2>
+                            <div class="wh-features">
+                                <div class="wh-feature">
+                                    <span class="wh-feature__icon" aria-hidden="true"><svg><use href="#wh-i-calendar"/></svg></span>
+                                    <p class="wh-feature__title">Aulas ao vivo</p>
+                                    <p class="wh-feature__text">Treine online com aulas e apps parceiros.</p>
+                                </div>
+                                <div class="wh-feature">
+                                    <span class="wh-feature__icon" aria-hidden="true"><svg><use href="#wh-i-heart"/></svg></span>
+                                    <p class="wh-feature__title">Mente e nutrição</p>
+                                    <p class="wh-feature__text">Meditação, terapia e acompanhamento nutricional.</p>
+                                </div>
+                                <div class="wh-feature">
+                                    <span class="wh-feature__icon" aria-hidden="true"><svg><use href="#wh-i-globe"/></svg></span>
+                                    <p class="wh-feature__title">Check-in internacional</p>
+                                    <p class="wh-feature__text">Use a rede parceira também em viagens.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- FAQ -->
+                        <div class="wh-block">
+                            <h2 class="wh-block__title">Perguntas frequentes</h2>
+                            <div class="wh-faq">
+                                <details class="wh-faq__item">
+                                    <summary class="wh-faq__q">Tem taxa de adesão?</summary>
+                                    <p class="wh-faq__a">Não. O Wellhub não cobra taxa de adesão nem de cancelamento.</p>
+                                </details>
+                                <details class="wh-faq__item">
+                                    <summary class="wh-faq__q">Posso cancelar quando quiser?</summary>
+                                    <p class="wh-faq__a">Sim. A assinatura pode ser cancelada a qualquer momento, sem multa.</p>
+                                </details>
+                                <details class="wh-faq__item">
+                                    <summary class="wh-faq__q">Consigo pausar o plano?</summary>
+                                    <p class="wh-faq__a">Sim. É possível pausar temporariamente o plano, sem custo extra.</p>
+                                </details>
+                                <details class="wh-faq__item">
+                                    <summary class="wh-faq__q">Quando sou cobrado?</summary>
+                                    <p class="wh-faq__a">A cobrança é mensal, contada a partir da data de ativação da sua inscrição.</p>
+                                </details>
+                            </div>
+                        </div>
+
+                        <!-- CTA final -->
+                        <div class="wh-cta">
+                            <h2 class="wh-cta__title">Pronto para começar?</h2>
+                            <p class="wh-cta__text">Faça sua inscrição colaborador e ative o benefício Wellhub.</p>
+                            <a href="/afr_wellhub/inscricao" class="wh-btn-primary" style="text-decoration:none; max-width:320px; margin:0 auto;">
+                                <span class="wh-btn-primary__icon-idle" aria-hidden="true">
+                                    <svg width="20" height="20"><use href="#wh-i-arrow-right"/></svg>
+                                </span>
+                                <span class="wh-btn-primary__label-idle">Fazer inscrição</span>
+                            </a>
+                        </div>
+
                     </div>
                 </section>
             </div>
