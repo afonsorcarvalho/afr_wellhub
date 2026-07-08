@@ -882,10 +882,24 @@
                                 </li>
                                 <li class="wh-steps__item">
                                     <strong>Crie a conta e confirme a empresa.</strong>
-                                    Abra o app e crie a sua conta usando <strong>o mesmo e-mail</strong>
-                                    da inscrição. O app vai pedir para confirmar a empresa/benefício —
-                                    é o que conecta o seu acesso ao plano contratado. Usar o mesmo
-                                    e-mail em tudo evita que o cadastro não seja reconhecido.
+                                    Isso pode acontecer de duas formas — as duas levam ao mesmo lugar:
+                                    <ul class="wh-substeps">
+                                        <li>
+                                            <strong>Pelo convite do Wellhub:</strong> você recebe um
+                                            e-mail de convite do próprio Wellhub com a
+                                            <strong>empresa provedora já configurada</strong>. Basta
+                                            clicar no link do convite e criar a sua conta — a empresa
+                                            já vem preenchida, você não precisa procurá-la.
+                                        </li>
+                                        <li>
+                                            <strong>Direto no app:</strong> se preferir (ou não
+                                            encontrar o convite), baixe o app, crie a conta e, quando
+                                            for solicitado, informe/confirme a empresa para liberar o
+                                            benefício.
+                                        </li>
+                                    </ul>
+                                    Em qualquer um dos casos, use sempre <strong>o mesmo e-mail</strong>
+                                    da inscrição, para o cadastro ser reconhecido.
                                 </li>
                                 <li class="wh-steps__item">
                                     <strong>Escolha o seu plano.</strong>
