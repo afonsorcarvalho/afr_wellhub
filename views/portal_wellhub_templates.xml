@@ -849,7 +849,7 @@
                             <ol class="wh-steps">
                                 <li class="wh-steps__item">
                                     <strong>Elegibilidade pela empresa.</strong>
-                                    Sua empresa contratou o Wellhub e liberou o benefício para os
+                                    Nossa empresa contratou o Wellhub e liberou o benefício para os
                                     colaboradores — é isso que dá direito ao seu acesso. Você não
                                     precisa combinar nada diretamente com as academias: a parceria
                                     já está feita. Basta seguir os passos abaixo para ativar.
@@ -859,7 +859,8 @@
                                     Preencha o formulário de inscrição colaborador com os seus dados
                                     (nome, CPF, e-mail e endereço). Ao enviar, você recebe no e-mail
                                     informado uma mensagem com o link de confirmação. Se não chegar em
-                                    alguns minutos, verifique as pastas de spam e promoções.
+                                    alguns minutos, verifique as pastas de spam e promoções, este link é válido apenas por 24 horas. Caso expire, solicite um novo link.
+
                                 </li>
                                 <li class="wh-steps__item">
                                     <strong>Confirmação e pagamento.</strong>
@@ -869,7 +870,7 @@
                                 </li>
                                 <li class="wh-steps__item">
                                     <strong>Cadastro no Wellhub.</strong>
-                                    Com a inscrição confirmada e o pagamento em dia, a empresa registra
+                                    Com a inscrição confirmada e o pagamento da taxa em dia, a empresa registra
                                     você na plataforma oficial do Wellhub. É esse cadastro que habilita
                                     a criação da sua conta no app, no passo seguinte. Você será avisado
                                     quando estiver liberado.
@@ -894,7 +895,7 @@
                                         <li>
                                             <strong>Direto no app:</strong> se preferir (ou não
                                             encontrar o convite), baixe o app, crie a conta e, quando
-                                            for solicitado, informe/confirme a empresa para liberar o
+                                            for solicitado, procure no campo empresa (JGMA) ao achar selecione- a empresa para liberar o
                                             benefício.
                                         </li>
                                     </ul>
@@ -924,7 +925,7 @@
                                 nutrição, sono etc.).
                             </p>
                             <p class="wh-block__lead">
-                                A sua empresa define quais planos ficam disponíveis, e você escolhe entre
+                                Existe diversos planos disponíveis, e você escolhe entre
                                 eles no app. Antes de decidir, dá para conferir exatamente <strong>quais
                                 academias entram em cada plano</strong> na busca oficial do Wellhub —
                                 filtre por plano e pesquise pela sua cidade, endereço ou CEP.
@@ -979,6 +980,23 @@
                                     </div>
                                 </div>
                             </div>
+                            <figure class="wh-video-embed">
+                                <figcaption class="wh-video-embed__label">
+                                    <svg width="14" height="14" aria-hidden="true"><use href="#wh-i-play"/></svg>
+                                    Veja o passo a passo do check-in em vídeo
+                                </figcaption>
+                                <div class="wh-video-frame">
+                                    <iframe
+                                        src="https://www.youtube-nocookie.com/embed/H8xBEHrJ2B8"
+                                        title="Como fazer check-in no app Wellhub"
+                                        loading="lazy"
+                                        referrerpolicy="strict-origin-when-cross-origin"
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                        allowfullscreen="allowfullscreen">
+                                    </iframe>
+                                </div>
+                            </figure>
+
                             <div class="wh-alert wh-alert--warning" role="note">
                                 <span class="wh-alert__icon" aria-hidden="true"><svg><use href="#wh-i-info"/></svg></span>
                                 <div class="wh-alert__body">
