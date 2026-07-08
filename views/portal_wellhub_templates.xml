@@ -984,12 +984,8 @@
                             <h2 class="wh-block__title">Perguntas frequentes</h2>
                             <div class="wh-faq">
                                 <details class="wh-faq__item">
-                                    <summary class="wh-faq__q">Tem taxa de adesão?</summary>
-                                    <p class="wh-faq__a">Não. O Wellhub não cobra taxa de adesão nem de cancelamento.</p>
-                                </details>
-                                <details class="wh-faq__item">
                                     <summary class="wh-faq__q">Posso cancelar quando quiser?</summary>
-                                    <p class="wh-faq__a">Sim. A assinatura pode ser cancelada a qualquer momento, sem multa.</p>
+                                    <p class="wh-faq__a">Sim. O desligamento da empresa deve ser solicitado com 30 dias de antecedência, para não gerar taxas da empresa. Já no app do Wellhub, o cancelamento pode ser feito a qualquer momento.</p>
                                 </details>
                                 <details class="wh-faq__item">
                                     <summary class="wh-faq__q">Consigo pausar o plano?</summary>
@@ -997,7 +993,7 @@
                                 </details>
                                 <details class="wh-faq__item">
                                     <summary class="wh-faq__q">Quando sou cobrado?</summary>
-                                    <p class="wh-faq__a">A cobrança é mensal, contada a partir da data de ativação da sua inscrição.</p>
+                                    <p class="wh-faq__a">A cobrança é mensal, contada a partir da data de ativação. A taxa da empresa e o app Wellhub são pagos separadamente, ambos cobrados no seu cartão.</p>
                                 </details>
                             </div>
                                 </div>
