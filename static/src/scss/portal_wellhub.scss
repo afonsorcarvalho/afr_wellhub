@@ -959,6 +959,98 @@
     color: var(--wh-ink-500);
 }
 
+/* Layout 2 colunas: texto | telas do app */
+.wh-split {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+    align-items: center;
+
+    @media (min-width: 880px) {
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 36px;
+    }
+}
+
+.wh-split__text {
+    min-width: 0;
+}
+
+.wh-split__media {
+    min-width: 0;
+    display: flex;
+    justify-content: center;
+}
+
+/* Moldura de celular */
+.wh-phone {
+    margin: 0;
+    max-width: 240px;
+    width: 100%;
+    padding: 8px;
+    background: linear-gradient(160deg, #14172b, #2b2f44);
+    border-radius: 30px;
+    box-shadow: var(--wh-sh-3);
+
+    img {
+        display: block;
+        width: 100%;
+        height: auto;
+        border-radius: 22px;
+    }
+}
+
+/* Par de celulares lado a lado, com leve sobreposição/rotação */
+.wh-phones {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 0;
+
+    .wh-phone {
+        max-width: 170px;
+
+        &:first-child {
+            transform: rotate(-4deg);
+            z-index: 1;
+        }
+        &:last-child {
+            margin-left: -34px;
+            transform: rotate(4deg) translateY(16px);
+        }
+    }
+
+    @media (min-width: 480px) {
+        .wh-phone { max-width: 190px; }
+    }
+}
+
+/* Features empilhadas (dentro de coluna estreita) */
+.wh-features--stack {
+    grid-template-columns: 1fr;
+
+    .wh-feature {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        column-gap: 14px;
+        align-items: start;
+
+        .wh-feature__icon { margin-bottom: 0; grid-row: span 2; }
+    }
+}
+
+/* Tips empilhados (dentro de coluna estreita) */
+.wh-tips--stack {
+    grid-template-columns: 1fr;
+}
+
+.wh-credit {
+    margin: 4px auto 0;
+    text-align: center;
+    font-size: 0.78rem;
+    color: var(--wh-ink-500);
+}
+
 .wh-faq {
     display: flex;
     flex-direction: column;

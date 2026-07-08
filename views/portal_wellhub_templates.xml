@@ -806,13 +806,24 @@
 
                         <!-- O que é -->
                         <div class="wh-block">
-                            <h2 class="wh-block__title">O que é o Wellhub</h2>
-                            <p class="wh-block__lead">
-                                O Wellhub (antigo Gympass) é como um "streaming de academias":
-                                com uma única mensalidade você acessa milhares de academias,
-                                estúdios e aplicativos de bem-estar — treino, meditação, terapia
-                                e nutrição — quando e onde quiser.
-                            </p>
+                            <div class="wh-split">
+                                <div class="wh-split__text">
+                                    <h2 class="wh-block__title">O que é o Wellhub</h2>
+                                    <p class="wh-block__lead">
+                                        O Wellhub (antigo Gympass) é como um "streaming de academias":
+                                        com uma única mensalidade você acessa milhares de academias,
+                                        estúdios e aplicativos de bem-estar — treino, meditação, terapia
+                                        e nutrição — quando e onde quiser.
+                                    </p>
+                                </div>
+                                <div class="wh-split__media">
+                                    <figure class="wh-phone">
+                                        <img src="/afr_wellhub/static/src/img/wellhub/bem-estar.webp"
+                                             alt="Tela do app Wellhub: bem-estar do seu jeito (fitness, mente, nutrição)"
+                                             loading="lazy" width="480" height="853"/>
+                                    </figure>
+                                </div>
+                            </div>
                             <div class="wh-features">
                                 <div class="wh-feature">
                                     <span class="wh-feature__icon" aria-hidden="true"><svg><use href="#wh-i-dumbbell"/></svg></span>
@@ -876,28 +887,46 @@
 
                         <!-- Primeiro check-in -->
                         <div class="wh-block">
-                            <h2 class="wh-block__title">
-                                <span class="wh-block__title-icon" aria-hidden="true"><svg><use href="#wh-i-pin"/></svg></span>
-                                Seu primeiro check-in
-                            </h2>
-                            <p class="wh-block__lead">
-                                O check-in é o que libera sua entrada na academia. Faça sempre pelo
-                                app, quando já estiver perto do local.
-                            </p>
-                            <ol class="wh-tips" aria-label="Passos do check-in">
-                                <li class="wh-tips__item">
-                                    <span class="wh-tips__num">1</span>
-                                    <p class="wh-tips__text">Abra o app e toque no botão <strong>check-in</strong> (no canto inferior).</p>
-                                </li>
-                                <li class="wh-tips__item">
-                                    <span class="wh-tips__num">2</span>
-                                    <p class="wh-tips__text">Veja os <strong>locais próximos</strong>, mostrados pela sua localização (GPS).</p>
-                                </li>
-                                <li class="wh-tips__item">
-                                    <span class="wh-tips__num">3</span>
-                                    <p class="wh-tips__text">Escolha a <strong>atividade</strong> e confirme o check-in perto do local.</p>
-                                </li>
-                            </ol>
+                            <div class="wh-split">
+                                <div class="wh-split__text">
+                                    <h2 class="wh-block__title">
+                                        <span class="wh-block__title-icon" aria-hidden="true"><svg><use href="#wh-i-pin"/></svg></span>
+                                        Seu primeiro check-in
+                                    </h2>
+                                    <p class="wh-block__lead">
+                                        O check-in é o que libera sua entrada na academia. Faça sempre pelo
+                                        app, quando já estiver perto do local.
+                                    </p>
+                                    <ol class="wh-tips wh-tips--stack" aria-label="Passos do check-in">
+                                        <li class="wh-tips__item">
+                                            <span class="wh-tips__num">1</span>
+                                            <p class="wh-tips__text">Abra o app e toque no botão <strong>check-in</strong> (no canto inferior).</p>
+                                        </li>
+                                        <li class="wh-tips__item">
+                                            <span class="wh-tips__num">2</span>
+                                            <p class="wh-tips__text">Veja os <strong>locais próximos</strong>, mostrados pela sua localização (GPS).</p>
+                                        </li>
+                                        <li class="wh-tips__item">
+                                            <span class="wh-tips__num">3</span>
+                                            <p class="wh-tips__text">Escolha a <strong>atividade</strong> e confirme o check-in perto do local.</p>
+                                        </li>
+                                    </ol>
+                                </div>
+                                <div class="wh-split__media">
+                                    <div class="wh-phones">
+                                        <figure class="wh-phone">
+                                            <img src="/afr_wellhub/static/src/img/wellhub/checkin-mapa.webp"
+                                                 alt="Tela do app Wellhub: mapa com academias e estúdios próximos"
+                                                 loading="lazy" width="480" height="853"/>
+                                        </figure>
+                                        <figure class="wh-phone">
+                                            <img src="/afr_wellhub/static/src/img/wellhub/checkin-confirmado.webp"
+                                                 alt="Tela do app Wellhub: check-in confirmado com QR code"
+                                                 loading="lazy" width="480" height="853"/>
+                                        </figure>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="wh-alert wh-alert--warning" role="note">
                                 <span class="wh-alert__icon" aria-hidden="true"><svg><use href="#wh-i-info"/></svg></span>
                                 <div class="wh-alert__body">
@@ -910,28 +939,48 @@
 
                         <!-- Além da academia -->
                         <div class="wh-block">
-                            <h2 class="wh-block__title">Vai muito além da academia</h2>
-                            <div class="wh-features">
-                                <div class="wh-feature">
-                                    <span class="wh-feature__icon" aria-hidden="true"><svg><use href="#wh-i-calendar"/></svg></span>
-                                    <p class="wh-feature__title">Aulas ao vivo</p>
-                                    <p class="wh-feature__text">Treine online com aulas e apps parceiros.</p>
+                            <div class="wh-split">
+                                <div class="wh-split__text">
+                                    <h2 class="wh-block__title">Vai muito além da academia</h2>
+                                    <div class="wh-features wh-features--stack">
+                                        <div class="wh-feature">
+                                            <span class="wh-feature__icon" aria-hidden="true"><svg><use href="#wh-i-calendar"/></svg></span>
+                                            <p class="wh-feature__title">Aulas ao vivo</p>
+                                            <p class="wh-feature__text">Treine online com aulas e apps parceiros.</p>
+                                        </div>
+                                        <div class="wh-feature">
+                                            <span class="wh-feature__icon" aria-hidden="true"><svg><use href="#wh-i-heart"/></svg></span>
+                                            <p class="wh-feature__title">Mente e nutrição</p>
+                                            <p class="wh-feature__text">Meditação, terapia e acompanhamento nutricional.</p>
+                                        </div>
+                                        <div class="wh-feature">
+                                            <span class="wh-feature__icon" aria-hidden="true"><svg><use href="#wh-i-globe"/></svg></span>
+                                            <p class="wh-feature__title">Check-in internacional</p>
+                                            <p class="wh-feature__text">Use a rede parceira também em viagens.</p>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="wh-feature">
-                                    <span class="wh-feature__icon" aria-hidden="true"><svg><use href="#wh-i-heart"/></svg></span>
-                                    <p class="wh-feature__title">Mente e nutrição</p>
-                                    <p class="wh-feature__text">Meditação, terapia e acompanhamento nutricional.</p>
-                                </div>
-                                <div class="wh-feature">
-                                    <span class="wh-feature__icon" aria-hidden="true"><svg><use href="#wh-i-globe"/></svg></span>
-                                    <p class="wh-feature__title">Check-in internacional</p>
-                                    <p class="wh-feature__text">Use a rede parceira também em viagens.</p>
+                                <div class="wh-split__media">
+                                    <div class="wh-phones">
+                                        <figure class="wh-phone">
+                                            <img src="/afr_wellhub/static/src/img/wellhub/aulas-ao-vivo.webp"
+                                                 alt="Tela do app Wellhub: aulas ao vivo para treinar em qualquer lugar"
+                                                 loading="lazy" width="480" height="853"/>
+                                        </figure>
+                                        <figure class="wh-phone">
+                                            <img src="/afr_wellhub/static/src/img/wellhub/apps-bem-estar.webp"
+                                                 alt="Tela do app Wellhub: mais de 40 apps de bem-estar (meditação, nutrição, sono)"
+                                                 loading="lazy" width="480" height="853"/>
+                                        </figure>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
                         <!-- FAQ -->
                         <div class="wh-block">
+                            <div class="wh-split">
+                                <div class="wh-split__text">
                             <h2 class="wh-block__title">Perguntas frequentes</h2>
                             <div class="wh-faq">
                                 <details class="wh-faq__item">
@@ -951,6 +1000,15 @@
                                     <p class="wh-faq__a">A cobrança é mensal, contada a partir da data de ativação da sua inscrição.</p>
                                 </details>
                             </div>
+                                </div>
+                                <div class="wh-split__media">
+                                    <figure class="wh-phone">
+                                        <img src="/afr_wellhub/static/src/img/wellhub/sem-taxas.webp"
+                                             alt="Tela do app Wellhub: cancele ou pause a qualquer momento e sem taxas"
+                                             loading="lazy" width="480" height="853"/>
+                                    </figure>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- CTA final -->
@@ -964,6 +1022,8 @@
                                 <span class="wh-btn-primary__label-idle">Fazer inscrição</span>
                             </a>
                         </div>
+
+                        <p class="wh-credit">Imagens das telas: aplicativo Wellhub (Gympass).</p>
 
                     </div>
                 </section>
