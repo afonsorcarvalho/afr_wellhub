@@ -604,7 +604,7 @@
 
 /* Vídeo incorporado dentro de um bloco (ex.: check-in) */
 .wh-video-embed {
-    margin: 24px 0 0;
+    margin: 24px 0 28px;
 }
 
 .wh-video-embed__label {
@@ -975,6 +975,11 @@
     @media (min-width: 640px) {
         grid-template-columns: repeat(3, 1fr);
     }
+}
+
+/* Respiro entre as telas do app (coluna do split) e os cards de feature abaixo */
+.wh-split + .wh-features {
+    margin-top: clamp(24px, 3vw, 36px);
 }
 
 .wh-feature {
