@@ -849,38 +849,49 @@
                             <ol class="wh-steps">
                                 <li class="wh-steps__item">
                                     <strong>Elegibilidade pela empresa.</strong>
-                                    Sua empresa oferece o Wellhub como benefício. É isso que
-                                    libera o seu acesso à plataforma.
+                                    Sua empresa contratou o Wellhub e liberou o benefício para os
+                                    colaboradores — é isso que dá direito ao seu acesso. Você não
+                                    precisa combinar nada diretamente com as academias: a parceria
+                                    já está feita. Basta seguir os passos abaixo para ativar.
                                 </li>
                                 <li class="wh-steps__item">
                                     <strong>Inscrição neste portal.</strong>
-                                    Preencha o formulário de inscrição colaborador com seus dados.
-                                    Você recebe um e-mail com o link de confirmação.
+                                    Preencha o formulário de inscrição colaborador com os seus dados
+                                    (nome, CPF, e-mail e endereço). Ao enviar, você recebe no e-mail
+                                    informado uma mensagem com o link de confirmação. Se não chegar em
+                                    alguns minutos, verifique as pastas de spam e promoções.
                                 </li>
                                 <li class="wh-steps__item">
                                     <strong>Confirmação e pagamento.</strong>
-                                    Clique no link do e-mail para ativar a inscrição e conclua o
-                                    pagamento da mensalidade. Só depois disso o benefício fica ativo.
+                                    Clique no link do e-mail recebido para ativar a inscrição e conclua
+                                    o pagamento da taxa mensal da empresa cadastrando o seu cartão de
+                                    crédito. Só depois disso o benefício fica ativo.
                                 </li>
                                 <li class="wh-steps__item">
                                     <strong>Cadastro no Wellhub.</strong>
-                                    Com a inscrição confirmada, você é registrado na plataforma
-                                    Wellhub oficial pela empresa.
+                                    Com a inscrição confirmada e o pagamento em dia, a empresa registra
+                                    você na plataforma oficial do Wellhub. É esse cadastro que habilita
+                                    a criação da sua conta no app, no passo seguinte. Você será avisado
+                                    quando estiver liberado.
                                 </li>
                                 <li class="wh-steps__item">
                                     <strong>Baixe o app Wellhub.</strong>
-                                    Instale o aplicativo Wellhub no seu celular (Android ou iPhone)
-                                    pela loja de apps.
+                                    No seu celular, baixe o aplicativo <strong>Wellhub</strong> (antigo
+                                    Gympass) — de graça — na Google Play (Android) ou na App Store
+                                    (iPhone). Basta procurar por "Wellhub" na loja e instalar.
                                 </li>
                                 <li class="wh-steps__item">
                                     <strong>Crie a conta e confirme a empresa.</strong>
-                                    No app, crie sua conta usando o mesmo e-mail e confirme os dados
-                                    da sua empresa para liberar o acesso.
+                                    Abra o app e crie a sua conta usando <strong>o mesmo e-mail</strong>
+                                    da inscrição. O app vai pedir para confirmar a empresa/benefício —
+                                    é o que conecta o seu acesso ao plano contratado. Usar o mesmo
+                                    e-mail em tudo evita que o cadastro não seja reconhecido.
                                 </li>
                                 <li class="wh-steps__item">
                                     <strong>Escolha o seu plano.</strong>
-                                    Selecione o plano com as opções de bem-estar que você quer usar.
-                                    Pronto — é só começar.
+                                    Dentro do app, escolha o plano com as opções de bem-estar que quer
+                                    usar (academias, estúdios e apps de meditação, terapia e nutrição).
+                                    Feito isso, é só fazer o primeiro check-in — veja como logo abaixo.
                                 </li>
                             </ol>
                         </div>
@@ -989,7 +1000,7 @@
                                 </details>
                                 <details class="wh-faq__item">
                                     <summary class="wh-faq__q">Consigo pausar o plano?</summary>
-                                    <p class="wh-faq__a">Sim. É possível pausar temporariamente o plano, sem custo extra.</p>
+                                    <p class="wh-faq__a">Sim. É possível pausar temporariamente o plano no app Wellhub. Mas a taxa da empresa continua enquanto o seu contrato estiver ativo.</p>
                                 </details>
                                 <details class="wh-faq__item">
                                     <summary class="wh-faq__q">Quando sou cobrado?</summary>
