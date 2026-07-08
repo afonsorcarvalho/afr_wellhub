@@ -896,6 +896,33 @@
                             </ol>
                         </div>
 
+                        <!-- Como funcionam os planos -->
+                        <div class="wh-block">
+                            <h2 class="wh-block__title">
+                                <span class="wh-block__title-icon" aria-hidden="true"><svg><use href="#wh-i-dumbbell"/></svg></span>
+                                Como funcionam os planos
+                            </h2>
+                            <p class="wh-block__lead">
+                                O Wellhub tem vários planos, organizados em níveis. Quanto mais alto o
+                                plano, maior a rede liberada — desde academias de bairro até grandes
+                                redes e estúdios premium. Cada nível dá acesso a um conjunto específico
+                                de academias, estúdios e também de apps de bem-estar (meditação,
+                                nutrição, sono etc.).
+                            </p>
+                            <p class="wh-block__lead">
+                                A sua empresa define quais planos ficam disponíveis, e você escolhe entre
+                                eles no app. Antes de decidir, dá para conferir exatamente <strong>quais
+                                academias entram em cada plano</strong> na busca oficial do Wellhub —
+                                filtre por plano e pesquise pela sua cidade, endereço ou CEP.
+                            </p>
+                            <a class="wh-btn-secondary" href="https://wellhub.com/pt-br/search/"
+                               target="_blank" rel="noopener noreferrer">
+                                <svg width="16" height="16" aria-hidden="true"><use href="#wh-i-pin"/></svg>
+                                Buscar academias por plano
+                                <svg width="16" height="16" aria-hidden="true"><use href="#wh-i-arrow-right"/></svg>
+                            </a>
+                        </div>
+
                         <!-- Primeiro check-in -->
                         <div class="wh-block">
                             <div class="wh-split">
