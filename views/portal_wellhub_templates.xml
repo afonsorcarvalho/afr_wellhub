@@ -938,7 +938,7 @@
                         </div>
 
                         <!-- Além da academia -->
-                        <div class="wh-block">
+                        <div class="wh-block wh-block--tint">
                             <div class="wh-split">
                                 <div class="wh-split__text">
                                     <h2 class="wh-block__title">Vai muito além da academia</h2>
@@ -1011,19 +1011,19 @@
                             </div>
                         </div>
 
-                        <!-- CTA final -->
+                        <p class="wh-credit">Imagens das telas: aplicativo Wellhub (Gympass).</p>
+
+                        <!-- CTA final (última batida da página) -->
                         <div class="wh-cta">
                             <h2 class="wh-cta__title">Pronto para começar?</h2>
                             <p class="wh-cta__text">Faça sua inscrição colaborador e ative o benefício Wellhub.</p>
-                            <a href="/afr_wellhub/inscricao" class="wh-btn-primary" style="text-decoration:none; max-width:320px; margin:0 auto;">
+                            <a href="/afr_wellhub/inscricao" class="wh-btn-primary wh-cta__btn">
                                 <span class="wh-btn-primary__icon-idle" aria-hidden="true">
                                     <svg width="20" height="20"><use href="#wh-i-arrow-right"/></svg>
                                 </span>
                                 <span class="wh-btn-primary__label-idle">Fazer inscrição</span>
                             </a>
                         </div>
-
-                        <p class="wh-credit">Imagens das telas: aplicativo Wellhub (Gympass).</p>
 
                     </div>
                 </section>
