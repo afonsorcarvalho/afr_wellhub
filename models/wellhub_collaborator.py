@@ -652,6 +652,17 @@ class WellhubCollaborator(models.Model):
                 )
                 chunk = data.get("data") or []
                 for item in chunk:
+                    # Cliente com mesmo CPF pode ter assinatura do outro programa
+                    # (Wellhub/TotalPass) na mesma conta Asaas: ignora cobranças alheias.
+                    item_sub = (item.get("subscription") or "").strip()
+                    if item_sub and (
+                        (rec.asaas_subscription_id and item_sub != rec.asaas_subscription_id)
+                        or (
+                            not rec.asaas_subscription_id
+                            and not self._asaas_subscription_is_ours(item_sub)
+                        )
+                    ):
+                        continue
                     pid = item.get("id")
                     if pid is not None:
                         seen_ids.add(str(pid))
@@ -717,14 +728,22 @@ class WellhubCollaborator(models.Model):
             collab = Collab.search(
                 [("asaas_subscription_id", "=", subscription_id)], limit=1
             )
-        if not collab and customer_id:
-            collab = Collab.search(
-                [("asaas_customer_id", "=", customer_id)], limit=1
-            )
+        # Mesma conta Asaas atende Wellhub e TotalPass e cada webhook recebe todos os
+        # eventos. checkoutSession é exclusivo de cada módulo: se veio e não é nosso, a
+        # cobrança é do outro programa. Só sem checkoutSession cai no fallback por customer
+        # (cliente com mesmo CPF pode estar nos dois programas), confirmando a assinatura.
         if not collab and checkout_session_id:
             collab = Collab.search(
                 [("asaas_checkout_id", "=", checkout_session_id)], limit=1
             )
+        elif not collab and customer_id:
+            collab = Collab.search(
+                [("asaas_customer_id", "=", customer_id)], limit=1
+            )
+            if collab and subscription_id and not self._asaas_subscription_is_ours(
+                subscription_id
+            ):
+                collab = Collab.browse()
         if not collab:
             _logger.warning(
                 "Asaas webhook payment: colaborador não encontrado "
@@ -762,6 +781,30 @@ class WellhubCollaborator(models.Model):
             payment, collab
         )
         collab._compute_wellhub_subscription_status()
+
+    @api.model
+    def _asaas_subscription_is_ours(self, subscription_id):
+        """True se a assinatura Asaas pertence ao Wellhub (externalReference ``afr_wh_*`` ou
+        description «[Assinatura recorrente Wellhub]»). Pertencendo a outro programa
+        (Wellhub/TotalPass) devolve False. Em dúvida (sem marcas / falha de API) devolve True
+        para manter o comportamento anterior.
+        """
+        try:
+            sub = self.env["afr.wellhub.asaas.api"]._request(
+                "GET", f"/v3/subscriptions/{subscription_id}"
+            )
+        except Exception:
+            _logger.warning(
+                "Wellhub webhook: não foi possível consultar assinatura %s.", subscription_id
+            )
+            return True
+        ext_ref = (sub.get("externalReference") or "").strip()
+        description = sub.get("description") or ""
+        if ext_ref.startswith("afr_wh_") or "Wellhub" in description:
+            return True
+        if ext_ref.startswith("afr_") or "[Assinatura recorrente" in description:
+            return False
+        return True
 
     @api.model
     def _webhook_process_checkout(self, checkout, event):

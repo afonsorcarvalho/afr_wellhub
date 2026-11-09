@@ -194,10 +194,9 @@ class AfrWellhubAsaasApi(models.AbstractModel):
 
     @api.model
     def _wellhub_portal_group_payload(self, collaborator):
-        """Retorna {'groupName': 'Wellhub'} se inscrição pelo portal; senão {}."""
+        """Retorna {'groupName': 'Wellhub'} para todo colaborador (separa Wellhub dos demais
+        programas, ex. Wellhub/TotalPass, na mesma conta Asaas)."""
         self.env["wellhub.collaborator"].browse(collaborator.id).ensure_one()
-        if not collaborator.portal_inscription:
-            return {}
         return {"groupName": ASAAS_WELLHUB_PORTAL_GROUP_NAME}
 
     @api.model
@@ -279,7 +278,11 @@ class AfrWellhubAsaasApi(models.AbstractModel):
             )
             if group_extra:
                 self._log_if_first_wellhub_group_customer()
-            self.customer_update(existing_by_doc, payload)
+            # Cliente pode já pertencer a outro programa (Wellhub/TotalPass) na mesma conta
+            # Asaas: não sobrescreve o externalReference dele; o vínculo local fica pelo id.
+            update_payload = dict(payload)
+            update_payload.pop("externalReference", None)
+            self.customer_update(existing_by_doc, update_payload)
             return existing_by_doc
 
         if group_extra:
