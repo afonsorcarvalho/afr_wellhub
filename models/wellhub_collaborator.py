@@ -893,7 +893,12 @@ class WellhubCollaborator(models.Model):
                     "signup_token_expiry": False,
                 }
             )
+        already_paid = collab.asaas_checkout_status == "PAID"
         collab.with_context(afr_wellhub_skip_asaas_sync=True).write(vals)
+        # Aviso interno do primeiro pagamento (checkout da inscrição). Só na transição para
+        # PAID: o Asaas reenvia webhooks e não queremos e-mail duplicado.
+        if event == "CHECKOUT_PAID" and not already_paid:
+            collab._send_checkout_paid_admin_notification()
         # PUT /v3/subscriptions/{id} para aplicar description + discount/interest/fine que
         # o Checkout não propaga ao criar a subscription automática. Idempotente; falhas são
         # logadas mas não bloqueiam o webhook (assinatura já existe no Asaas).
@@ -908,6 +913,26 @@ class WellhubCollaborator(models.Model):
                     "(collaborator id=%s).",
                     sub_id_to_update,
                     collab.id,
+                )
+
+    def _send_checkout_paid_admin_notification(self):
+        """Envia aviso interno de pagamento do checkout de inscrição. Falha não bloqueia webhook."""
+        template = self.env.ref(
+            "afr_wellhub.mail_template_wellhub_checkout_paid_admin",
+            raise_if_not_found=False,
+        )
+        if not template:
+            _logger.warning(
+                "Template afr_wellhub.mail_template_wellhub_checkout_paid_admin não encontrado."
+            )
+            return
+        for rec in self:
+            try:
+                template.sudo().send_mail(rec.id, force_send=True)
+            except Exception:
+                _logger.exception(
+                    "Wellhub: falha ao enviar aviso de checkout pago (collaborator id=%s).",
+                    rec.id,
                 )
 
     def action_sync_wellhub_api(self):
